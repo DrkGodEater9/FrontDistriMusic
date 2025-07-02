@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DistriMusic - Iniciar Sesión</title>
+    <link rel="stylesheet" href="auth.css">
+    <link href="https://fonts.googleapis.com/css2?family=Circular:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-container">
+        <!-- Botón de volver -->
+        <div class="back-button">
+            <a href="index.html" class="btn-back">← Volver al inicio</a>
+        </div>
+        
+        <div class="auth-card">
+            <!-- Header con logo -->
+            <div class="auth-header">
+                <h1 class="logo">DistriMusic</h1>
+                <p class="subtitle">Tu red social musical universitaria</p>
+            </div>
+
+            <!-- Formulario de Login -->
+            <div id="loginForm" class="form-container">
+                <h2>Iniciar Sesión</h2>
+                <form>
+                    <div class="input-group">
+                        <label for="loginUser">Usuario</label>
+                        <input type="text" id="loginUser" name="usuario" placeholder="Tu nickname" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="loginPassword">Contraseña</label>
+                        <input type="password" id="loginPassword" name="password" placeholder="Tu contraseña" required>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">Iniciar Sesión</button>
+                </form>
+                
+                <div class="auth-footer">
+                    <p>¿No tienes cuenta? <a href="#" onclick="toggleForm()">Regístrate</a></p>
+                </div>
+            </div>
+
+            <!-- Formulario de Registro -->
+            <div id="registerForm" class="form-container hidden">
+                <h2>Registrarse</h2>
+                <form>
+                    <div class="input-group">
+                        <label for="registerUser">Usuario</label>
+                        <input type="text" id="registerUser" name="usuario" placeholder="Tu nickname único" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="registerName">Nombre</label>
+                        <input type="text" id="registerName" name="nombre" placeholder="Tu nombre completo" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="registerPassword">Contraseña</label>
+                        <input type="password" id="registerPassword" name="password" placeholder="Mínimo 8 caracteres" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="confirmPassword">Confirmar Contraseña</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Repite tu contraseña" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="studentCode">Código Estudiantil</label>
+                        <input type="text" id="studentCode" name="codigo" placeholder="Tu código de estudiante" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="career">Carrera</label>
+                        <select id="career" name="carrera" required>
+                            <option value="">Selecciona tu carrera</option>
+                            <option value="ing-sistemas">Ingeniería de Sistemas</option>
+                            <option value="ing-electronica">Ingeniería Electrónica</option>
+                            <option value="ing-electrica">Ingeniería Eléctrica</option>
+                            <option value="ing-industrial">Ingeniería Industrial</option>
+                            <option value="ing-civil">Ingeniería Civil</option>
+                            <option value="ing-catastral">Ingeniería Catastral y Geodesia</option>
+                            <option value="ing-ambiental">Ingeniería Ambiental</option>
+                            <option value="ing-mecanica">Ingeniería Mecánica</option>
+                            <option value="ing-topografica">Ingeniería Topográfica</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">Registrarse</button>
+                </form>
+                
+                <div class="auth-footer">
+                    <p>¿Ya tienes cuenta? <a href="#" onclick="toggleForm()">Inicia sesión</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+</body>
+</html>

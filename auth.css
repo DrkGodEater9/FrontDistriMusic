@@ -1,0 +1,325 @@
+/* Variables CSS */
+:root {
+    --spotify-purple: #8b5cf6;
+    --spotify-dark-purple: #7c3aed;
+    --spotify-black: #191414;
+    --spotify-dark-gray: #121212;
+    --spotify-gray: #535353;
+    --spotify-light-gray: #b3b3b3;
+    --spotify-white: #ffffff;
+    --error-color: #ef4444;
+    --success-color: #10b981;
+}
+
+/* Reset y estilos base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Circular', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, var(--spotify-black) 0%, var(--spotify-dark-gray) 100%);
+    color: var(--spotify-white);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.6;
+}
+
+/* Container principal */
+.auth-container {
+    width: 100%;
+    max-width: 380px;
+    padding: 20px;
+    position: relative;
+}
+
+/* Botón de volver */
+.back-button {
+    margin-bottom: 20px;
+}
+
+.btn-back {
+    color: var(--spotify-light-gray);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-back:hover {
+    color: var(--spotify-white);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--spotify-purple);
+    transform: translateX(-5px);
+}
+
+.auth-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Header */
+.auth-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo {
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--spotify-purple);
+    margin-bottom: 6px;
+}
+
+.subtitle {
+    color: var(--spotify-light-gray);
+    font-size: 12px;
+}
+
+/* Formularios */
+.form-container {
+    transition: all 0.3s ease;
+}
+
+.form-container.hidden {
+    display: none;
+}
+
+.form-container h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    text-align: center;
+    color: var(--spotify-white);
+}
+
+/* Grupos de input */
+.input-group {
+    margin-bottom: 14px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 500;
+    color: var(--spotify-white);
+    font-size: 13px;
+}
+
+.input-group input,
+.input-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid var(--spotify-gray);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--spotify-white);
+    font-size: 14px;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.input-group input::placeholder {
+    color: var(--spotify-light-gray);
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    outline: none;
+    border-color: var(--spotify-purple);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.input-group select {
+    cursor: pointer;
+}
+
+.input-group select option {
+    background: var(--spotify-dark-gray);
+    color: var(--spotify-white);
+    padding: 10px;
+}
+
+/* Botones */
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    background: var(--spotify-purple);
+    color: var(--spotify-white);
+    border: none;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 6px;
+    font-family: inherit;
+}
+
+.btn-primary:hover {
+    background: var(--spotify-dark-purple);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Footer de autenticación */
+.auth-footer {
+    text-align: center;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.auth-footer p {
+    color: var(--spotify-light-gray);
+    font-size: 12px;
+}
+
+.auth-footer a {
+    color: var(--spotify-purple);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.auth-footer a:hover {
+    color: var(--spotify-white);
+    text-decoration: underline;
+}
+
+/* Estados de validación */
+.input-group.error input,
+.input-group.error select {
+    border-color: var(--error-color);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.input-group.success input,
+.input-group.success select {
+    border-color: var(--success-color);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.error-message {
+    color: var(--error-color);
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+}
+
+.input-group.error .error-message {
+    display: block;
+}
+
+/* Animaciones */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-container {
+    animation: slideIn 0.4s ease-out;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .auth-container {
+        padding: 10px;
+        max-width: 340px;
+    }
+    
+    .auth-card {
+        padding: 20px;
+        border-radius: 12px;
+    }
+    
+    .logo {
+        font-size: 22px;
+    }
+    
+    .form-container h2 {
+        font-size: 18px;
+    }
+    
+    .input-group input,
+    .input-group select {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+    
+    .btn-primary {
+        padding: 12px;
+        font-size: 14px;
+    }
+    
+    .btn-back {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+}
+
+/* Efectos adicionales */
+.auth-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 20px;
+    padding: 1px;
+    background: linear-gradient(135deg, var(--spotify-purple), transparent, var(--spotify-purple));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    z-index: -1;
+}
+
+/* Loading state para futura implementación */
+.btn-primary.loading {
+    opacity: 0.7;
+    cursor: not-allowed;
+    position: relative;
+}
+
+.btn-primary.loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    margin: auto;
+    border: 2px solid transparent;
+    border-top-color: var(--spotify-white);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
