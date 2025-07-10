@@ -72,6 +72,8 @@ async function loadUserStats() {
         if (seguidoresResponse.ok) {
             const seguidores = await seguidoresResponse.json();
             document.getElementById('statSeguidores').textContent = seguidores.length;
+            // Guardar lista para mostrar en modal
+            window._userFollowersList = seguidores;
         }
 
         // Cargar siguiendo
@@ -79,12 +81,72 @@ async function loadUserStats() {
         if (siguiendoResponse.ok) {
             const siguiendo = await siguiendoResponse.json();
             document.getElementById('statSiguiendo').textContent = siguiendo.length;
+            // Guardar lista para mostrar en modal
+            window._userFollowingList = siguiendo;
         }
 
     } catch (error) {
         console.error('❌ Error loading user stats:', error);
     }
 }
+// ✅ MODAL PARA VER SEGUIDORES Y SIGUIENDO
+function showUserListModal(type) {
+    let users = [];
+    let title = '';
+    if (type === 'followers') {
+        users = window._userFollowersList || [];
+        title = 'Tus seguidores';
+    } else {
+        users = window._userFollowingList || [];
+        title = 'A quién sigues';
+    }
+    let html = `<div class="user-list-modal-content">
+        <h3>${title}</h3>
+        <ul class="user-list-modal-ul">
+            ${users.length === 0 ? '<li>No hay usuarios para mostrar</li>' : users.map(u => `
+                <li>
+                    <span class="user-list-avatar">${u.profileImageUrl && isValidUrl(u.profileImageUrl) ? `<img src='${u.profileImageUrl}' alt='avatar' class='user-list-img'>` : (u.nombre ? u.nombre.charAt(0).toUpperCase() : '👤')}</span>
+                    <span class="user-list-name">${u.nombre || u.usuario}</span>
+                    <span class="user-list-username">@${u.usuario}</span>
+                </li>
+            `).join('')}
+        </ul>
+        <button class="btn-secondary" id="btnCloseUserListModal">Cerrar</button>
+    </div>`;
+    let modal = document.getElementById('userListModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'userListModal';
+        modal.className = 'modal';
+        modal.innerHTML = `<div class="modal-content">${html}</div>`;
+        document.body.appendChild(modal);
+    } else {
+        modal.innerHTML = `<div class="modal-content">${html}</div>`;
+    }
+    modal.style.display = 'block';
+    setTimeout(() => {
+        const btnClose = document.getElementById('btnCloseUserListModal');
+        if (btnClose) btnClose.onclick = closeUserListModal;
+    }, 0);
+}
+
+function closeUserListModal() {
+    const modal = document.getElementById('userListModal');
+    if (modal) modal.style.display = 'none';
+}
+
+// Agregar estilos para el modal de lista de usuarios
+const userListModalStyle = document.createElement('style');
+userListModalStyle.textContent = `
+    .user-list-modal-content { padding: 24px 16px 16px 16px; min-width: 280px; }
+    .user-list-modal-ul { list-style: none; padding: 0; margin: 16px 0 0 0; max-height: 320px; overflow-y: auto; }
+    .user-list-modal-ul li { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid #eee; }
+    .user-list-avatar { width: 36px; height: 36px; border-radius: 50%; background: #f3f3f3; display: flex; align-items: center; justify-content: center; font-size: 18px; overflow: hidden; }
+    .user-list-img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+    .user-list-name { font-weight: 500; margin-right: 6px; }
+    .user-list-username { color: #888; font-size: 13px; }
+`;
+document.head.appendChild(userListModalStyle);
 
 // ✅ FUNCIÓN PARA CARGAR MIS PLAYLISTS
 async function loadMyPlaylists() {
@@ -225,8 +287,9 @@ function showPlaylistDetailModal(playlist, songs) {
     }
     if (typeElement) typeElement.textContent = `Tipo: ${playlist.esPublica ? 'Pública' : 'Privada'}`;
 
+
     // Agregar lista de canciones
-    const songsHTML = songs.length > 0 ? `
+    let songsHTML = songs.length > 0 ? `
         <div class="playlist-songs">
             <h4>Canciones (${songs.length})</h4>
             <div class="songs-list">
@@ -253,9 +316,10 @@ function showPlaylistDetailModal(playlist, songs) {
         </div>
     ` : '<div class="empty-songs"><p>Esta playlist no tiene canciones aún</p></div>';
 
-    // Agregar botón para agregar canciones si es el propietario
+    // Botón para agregar canciones si es el propietario (fuera de la lista de canciones, SEPARADO)
     const addSongsButton = currentUser && playlist.usuario?.usuario === currentUser.usuario ? `
-        <div class="playlist-actions">
+        <div class="playlist-section-divider"></div>
+        <div class="playlist-actions playlist-add-songs-actions">
             <button class="btn-primary" onclick="showAddSongsModal(${playlist.id})">
                 <span class="material-icons">add</span>
                 Agregar Canciones
@@ -263,14 +327,478 @@ function showPlaylistDetailModal(playlist, songs) {
         </div>
     ` : '';
 
+    // Botón para ver perfil del creador (si no es el usuario actual)
+    const viewProfileButtonHTML = (playlist.usuario && currentUser && playlist.usuario.usuario !== currentUser.usuario) ? `
+        <div class="playlist-section-divider"></div>
+        <div class="playlist-actions" style="margin: 10px 0 0 0; display: flex; justify-content: flex-end;">
+            <button class="btn-primary" id="btnViewCreatorProfile">
+                <span class="material-icons">account_circle</span>
+                Ver perfil de ${playlist.usuario.nombre}
+            </button>
+        </div>
+    ` : '';
+
     // Actualizar el contenido del modal
     const existingPlaylistInfo = contentArea.querySelector('.playlist-info');
     if (existingPlaylistInfo) {
-        existingPlaylistInfo.insertAdjacentHTML('afterend', songsHTML + addSongsButton);
+        // Primero canciones, luego botón agregar canciones, luego perfil, luego comentarios
+        existingPlaylistInfo.insertAdjacentHTML('afterend',
+            songsHTML +
+            addSongsButton +
+            viewProfileButtonHTML +
+            '<div class="playlist-section-divider"></div>' +
+            // Mover la sección de comentarios aquí
+            '<div id="commentsSection" style="display:none;">\
+                <div class="comments-title">Comentarios</div>\
+                <div id="commentsList"></div>\
+                <form id="commentForm">\
+                    <input type="text" id="commentInput" class="input" placeholder="Escribe un comentario..." maxlength="200">\
+                    <button type="submit">Comentar</button>\
+                </form>\
+            </div>'
+        );
+    }
+// Estilos para separar secciones en el modal de playlist
+const playlistSectionDividerStyle = document.createElement('style');
+playlistSectionDividerStyle.textContent = `
+    .playlist-section-divider {
+        width: 100%;
+        height: 18px;
+        border: none;
+        margin: 18px 0 0 0;
+        background: transparent;
+        display: block;
+    }
+    .playlist-add-songs-actions {
+        margin: 0 0 18px 0;
+        display: flex;
+        justify-content: flex-end;
+        position: relative;
+        z-index: 10;
+    }
+    .playlist-songs {
+        position: relative;
+        z-index: 5;
+    }
+    .playlist-actions button, .btn-primary, .btn-secondary, .btn-remove-song, .btn-add-song {
+        z-index: 20;
+        position: relative;
+    }
+    .playlist-actions button:active, .btn-primary:active, .btn-secondary:active, .btn-remove-song:active, .btn-add-song:active {
+        filter: brightness(0.92);
+        outline: none;
+    }
+    .playlist-actions button:focus, .btn-primary:focus, .btn-secondary:focus, .btn-remove-song:focus, .btn-add-song:focus {
+        outline: 2px solid #8b5cf6;
+        outline-offset: 2px;
+    }
+`;
+document.head.appendChild(playlistSectionDividerStyle);
+
+    // Mostrar sección de comentarios solo si la playlist es pública
+    setTimeout(() => {
+        const commentsSection = document.getElementById('commentsSection');
+        if (playlist.esPublica && commentsSection) {
+            commentsSection.style.display = 'block';
+            loadCommentsForPlaylist(playlist.id);
+            // Habilitar formulario
+            const commentForm = document.getElementById('commentForm');
+            if (commentForm) {
+                commentForm.onsubmit = function(e) {
+                    e.preventDefault();
+                    submitComment(playlist.id);
+                };
+            }
+        } else if (commentsSection) {
+            commentsSection.style.display = 'none';
+        }
+    }, 0);
+// Cargar comentarios de una playlist pública
+async function loadCommentsForPlaylist(playlistId) {
+    const commentsList = document.getElementById('commentsList');
+    if (!commentsList) return;
+    
+    commentsList.innerHTML = '<div class="loading">Cargando comentarios...</div>';
+    
+    try {
+        const res = await fetch(`${API_BASE_URL}/comments/playlist/${playlistId}`);
+        const errorText = await res.text();
+        
+        try {
+            // Intentar parsear como JSON primero
+            const comments = JSON.parse(errorText);
+            
+            if (res.ok) {
+                if (comments.length === 0) {
+                    commentsList.innerHTML = '<div class="empty-comments">Sé el primero en comentar esta playlist.</div>';
+                } else {
+                    commentsList.innerHTML = comments.map(c => {
+                        const isOwner = currentUser && c.usuario && c.usuario.usuario === currentUser.usuario;
+                        return `
+                            <div class="comment-item" data-comment-id="${c.id}">
+                                <div class="comment-header">
+                                    <span class="comment-user">${c.usuario?.nombre || c.usuario?.usuario || 'Usuario'}</span>
+                                    <span class="comment-date">${c.fechaComentario ? new Date(c.fechaComentario).toLocaleString('es-ES') : ''}</span>
+                                    ${isOwner ? `
+                                        <span class="comment-actions">
+                                            <button class="btn-delete-comment" title="Eliminar" onclick="deleteComment(${c.id}, ${playlistId})">
+                                                <span class="material-icons">delete</span>
+                                            </button>
+                                        </span>
+                                    ` : ''}
+                                </div>
+                                <div class="comment-content" id="commentContent${c.id}">${c.contenido}</div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } else {
+                throw new Error('No es un JSON válido');
+            }
+        } catch (jsonError) {
+            // Si no es JSON, manejar el texto del error
+            console.error('Error del servidor:', errorText);
+            
+            if (res.status === 404) {
+                commentsList.innerHTML = '<div class="empty-comments error">La playlist no existe o fue eliminada.</div>';
+                showMessage('La playlist no existe o fue eliminada', 'error');
+            } else if (res.status === 403) {
+                commentsList.innerHTML = '<div class="empty-comments error">No tienes permiso para ver los comentarios de esta playlist.</div>';
+                showMessage('No tienes permiso para ver los comentarios', 'error');
+            } else {
+                commentsList.innerHTML = '<div class="empty-comments error">No se pudieron cargar los comentarios.</div>';
+                showMessage(errorText || 'Error al cargar comentarios', 'error');
+            }
+        }
+    } catch (e) {
+        console.error('Error de conexión:', e);
+        commentsList.innerHTML = '<div class="empty-comments error">Error de conexión.</div>';
+        showMessage('Error de conexión: ' + e.message, 'error');
+    }
+}
+
+// Enviar nuevo comentario
+async function submitComment(playlistId) {
+    const input = document.getElementById('commentInput');
+    const submitButton = document.querySelector('#commentForm button[type="submit"]');
+    if (!input || !input.value.trim()) return;
+    
+    const contenido = input.value.trim();
+    input.disabled = true;
+    submitButton.disabled = true;
+    
+    try {
+        const res = await fetch(`${API_BASE_URL}/comments/playlist/${playlistId}?usuario=${encodeURIComponent(currentUser.usuario)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contenido })
+        });
+
+        if (res.ok) {
+            input.value = '';
+            loadCommentsForPlaylist(playlistId);
+            showMessage('Comentario agregado exitosamente', 'success');
+        } else {
+            const errorText = await res.text();
+            console.error('Error del servidor:', errorText);
+            
+            if (res.status === 404) {
+                showMessage('La playlist no existe o fue eliminada', 'error');
+            } else if (res.status === 403) {
+                showMessage('No tienes permiso para comentar en esta playlist', 'error');
+            } else {
+                showMessage(errorText || 'No se pudo enviar el comentario', 'error');
+            }
+        }
+    } catch (e) {
+        console.error('Error al enviar comentario:', e);
+        showMessage('Error de conexión: ' + e.message, 'error');
+    } finally {
+        input.disabled = false;
+        submitButton.disabled = false;
+    }
+}
+
+// Eliminar comentario (solo el dueño)
+window.deleteComment = async function(commentId, playlistId) {
+    if (!confirm('¿Seguro que deseas eliminar este comentario?')) return;
+    try {
+        const res = await fetch(`${API_BASE_URL}/comments/${commentId}?usuario=${encodeURIComponent(currentUser.usuario)}`, {
+            method: 'DELETE'
+        });
+        if (res.ok) {
+            showMessage('Comentario eliminado', 'success');
+            loadCommentsForPlaylist(playlistId);
+        } else {
+            showMessage('No se pudo eliminar el comentario', 'error');
+        }
+    } catch (e) {
+        showMessage('Error de conexión', 'error');
+    }
+};
+
+// Estilos para comentarios (mejorados para fondo oscuro y mejor visual)
+const commentsStyle = document.createElement('style');
+commentsStyle.textContent = `
+    #commentsSection {
+        border-top: 1px solid #8b5cf6;
+        padding-top: 18px;
+        margin-top: 18px;
+        background: rgba(30, 20, 50, 0.7);
+        border-radius: 0 0 16px 16px;
+    }
+    .comments-title {
+        color: #fff;
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        letter-spacing: 0.5px;
+    }
+    .comment-item {
+        margin-bottom: 16px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #3a2a5e;
+        color: #fff;
+        background: rgba(60, 40, 90, 0.25);
+        border-radius: 8px;
+        padding: 10px 12px 8px 12px;
+    }
+    .comment-header {
+        font-size: 13px;
+        color: #bfaaff;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 2px;
+        align-items: center;
+    }
+    .comment-user {
+        font-weight: 600;
+        color: #fff;
+        margin-right: 8px;
+    }
+    .comment-date {
+        font-style: italic;
+        color: #bfaaff;
+        margin-left: 8px;
+    }
+    .comment-content {
+        font-size: 15px;
+        color: #fff;
+        margin-top: 2px;
+        word-break: break-word;
+    }
+    .empty-comments {
+        color: #bfaaff;
+        font-size: 14px;
+        margin: 12px 0;
+        text-align: center;
+    }
+    .empty-comments.error {
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.1);
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+    #commentInput.input {
+        border-radius: 6px;
+        border: 1px solid #8b5cf6;
+        padding: 8px;
+        background: #1a102a;
+        color: #fff;
+    }
+    #commentInput.input::placeholder {
+        color: #bfaaff;
+        opacity: 1;
+    }
+    .comment-actions {
+        display: inline-flex;
+        gap: 4px;
+        margin-left: 10px;
+    }
+    .btn-delete-comment {
+        background: none;
+        border: none;
+        color: #bfaaff;
+        cursor: pointer;
+        padding: 2px 4px;
+        font-size: 16px;
+        transition: color 0.2s;
+    }
+    .btn-delete-comment:hover {
+        color: #ef4444;
+    }
+    #commentForm {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+    }
+    #commentForm input[type="text"], #commentInput.input {
+        flex: 1;
+        background: #1a102a;
+        color: #fff;
+        border: 1px solid #8b5cf6;
+        border-radius: 6px;
+        padding: 8px;
+    }
+    #commentForm button {
+        background: #8b5cf6;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 8px 18px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    #commentForm button:hover {
+        background: #a78bfa;
+    }
+    #commentForm button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    .loading {
+        color: #bfaaff;
+        text-align: center;
+        padding: 12px;
+        font-style: italic;
+    }
+`;
+document.head.appendChild(commentsStyle);
+
+    // ...existing code...
+
+    // Evento para el botón de ver perfil
+    if (viewProfileButtonHTML) {
+        setTimeout(() => {
+            const btnViewCreatorProfile = document.getElementById('btnViewCreatorProfile');
+            if (btnViewCreatorProfile) {
+                btnViewCreatorProfile.onclick = () => viewUserProfile(playlist.usuario.usuario, playlist.usuario.nombre, playlist.usuario.profileImageUrl);
+            }
+        }, 0);
     }
 
     modal.style.display = 'block';
     selectedPlaylistForSongs = playlist.id;
+// Mostrar perfil del usuario creador de la playlist (mejorado)
+async function viewUserProfile(usuario, nombre, profileImageUrl) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/users/${usuario}`);
+        if (!response.ok) {
+            showMessage('No se pudo cargar el perfil del usuario', 'error');
+            return;
+        }
+        const user = await response.json();
+        // Imagen de perfil o emoji
+        let avatarHtml = '';
+        if (user.profileImageUrl && isValidUrl(user.profileImageUrl)) {
+            avatarHtml = `<img src="${user.profileImageUrl}" alt="Avatar" class="profile-avatar-modal">`;
+        } else {
+            const initial = user.nombre ? user.nombre.charAt(0).toUpperCase() : '👤';
+            avatarHtml = `<div class="profile-avatar-modal profile-avatar-emoji">${initial}</div>`;
+        }
+        // Botón de seguir (no mostrar si ya es el usuario actual)
+        let followBtn = '';
+        if (currentUser && user.usuario !== currentUser.usuario) {
+            followBtn = `<button class="btn-secondary" id="btnFollowCreatorModal">
+                <span class="material-icons">person_add</span> Seguir
+            </button>`;
+        }
+        let html = `<div class="user-profile-modal-content">
+            <div class="profile-avatar-modal-container">${avatarHtml}</div>
+            <h3>${user.nombre}</h3>
+            <p><b>Usuario:</b> ${user.usuario}</p>
+            <p><b>Email:</b> ${user.email || 'No disponible'}</p>
+            <p><b>Carrera:</b> ${user.carrera || 'No disponible'}</p>
+            ${followBtn}
+            <button class="btn-secondary" id="btnCloseUserProfileModal">Cerrar</button>
+        </div>`;
+        let modal = document.getElementById('userProfileModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'userProfileModal';
+            modal.className = 'modal';
+            modal.innerHTML = `<div class="modal-content">${html}</div>`;
+            document.body.appendChild(modal);
+        } else {
+            modal.innerHTML = `<div class="modal-content">${html}</div>`;
+        }
+        modal.style.display = 'block';
+        // Evento cerrar
+        setTimeout(() => {
+            const btnClose = document.getElementById('btnCloseUserProfileModal');
+            if (btnClose) btnClose.onclick = closeUserProfileModal;
+            const btnFollow = document.getElementById('btnFollowCreatorModal');
+            if (btnFollow) btnFollow.onclick = () => followUser(user.usuario, user.nombre);
+        }, 0);
+    } catch (e) {
+        showMessage('Error al cargar perfil', 'error');
+    }
+}
+
+function closeUserProfileModal() {
+    const modal = document.getElementById('userProfileModal');
+    if (modal) modal.style.display = 'none';
+}
+
+// Seguir usuario
+async function followUser(usuario, nombre) {
+    try {
+        // Enviar el usuario que sigue (follower) en el body como JSON
+        const response = await fetch(`${API_BASE_URL}/users/${usuario}/follow`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ follower: currentUser.usuario })
+        });
+        if (response.ok) {
+            showMessage(`Ahora sigues a ${nombre}`, 'success');
+            // Actualizar contadores de seguidores y siguiendo
+            if (typeof loadUserStats === 'function') loadUserStats();
+        } else {
+            const error = await response.text();
+            showMessage(error || 'No se pudo seguir al usuario', 'error');
+        }
+    } catch (e) {
+        showMessage('Error de conexión al seguir usuario', 'error');
+    }
+}
+// Estilos para el modal de perfil de usuario
+const userProfileModalStyle = document.createElement('style');
+userProfileModalStyle.textContent = `
+    .user-profile-modal-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 24px 16px 16px 16px;
+        min-width: 280px;
+    }
+    .profile-avatar-modal-container {
+        margin-bottom: 12px;
+    }
+    .profile-avatar-modal {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        background: #f3f3f3;
+        display: block;
+    }
+    .profile-avatar-emoji {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--spotify-purple), var(--distrital-gold));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+`;
+document.head.appendChild(userProfileModalStyle);
 }
 
 // ✅ FUNCIÓN PARA MOSTRAR MODAL DE AGREGAR CANCIONES - CORREGIDA
@@ -531,7 +1059,9 @@ function renderSearchResults(songs, container) {
 
     container.innerHTML = `
         <h4>Resultados de búsqueda:</h4>
-        ${songsHTML}
+        <div class="search-results-list">
+            ${songsHTML}
+        </div>
     `;
 }
 
@@ -540,6 +1070,7 @@ function selectSong(songId) {
     showMessage(`Canción seleccionada. Funcionalidad en desarrollo para reproducir.`, 'info');
 }
 
+
 // ✅ FUNCIÓN PARA CREAR PLAYLIST
 async function createPlaylist(playlistData) {
     try {
@@ -547,7 +1078,6 @@ async function createPlaylist(playlistData) {
             ...playlistData,
             usuario: currentUser
         };
-
         const response = await fetch(`${API_BASE_URL}/playlists`, {
             method: 'POST',
             headers: {
@@ -555,7 +1085,6 @@ async function createPlaylist(playlistData) {
             },
             body: JSON.stringify(requestData)
         });
-
         if (response.ok) {
             const newPlaylist = await response.json();
             showMessage('¡Playlist creada exitosamente!', 'success');
@@ -899,6 +1428,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnRefreshExplorar = document.getElementById('btnRefreshExplorar');
     if (btnRefreshExplorar) {
         btnRefreshExplorar.addEventListener('click', loadPublicPlaylists);
+    }
+
+    // Botones para ver seguidores y siguiendo
+    const btnVerSeguidores = document.getElementById('btnVerSeguidores');
+    if (btnVerSeguidores) {
+        btnVerSeguidores.addEventListener('click', () => showUserListModal('followers'));
+    }
+    const btnVerSiguiendo = document.getElementById('btnVerSiguiendo');
+    if (btnVerSiguiendo) {
+        btnVerSiguiendo.addEventListener('click', () => showUserListModal('following'));
     }
 
     console.log('✅ Dashboard inicializado correctamente');

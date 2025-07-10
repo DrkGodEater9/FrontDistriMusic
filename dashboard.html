@@ -47,10 +47,12 @@
                     <div class="stat-item">
                         <span class="stat-label">Seguidores:</span>
                         <span class="stat-value" id="statSeguidores">0</span>
+                        <button id="btnVerSeguidores" class="btn-secondary btn-sm" style="margin-left:8px;">Ver seguidores</button>
                     </div>
                     <div class="stat-item">
                         <span class="stat-label">Siguiendo:</span>
                         <span class="stat-value" id="statSiguiendo">0</span>
+                        <button id="btnVerSiguiendo" class="btn-secondary btn-sm" style="margin-left:8px;">Ver siguiendo</button>
                     </div>
                 </div>
 
@@ -146,6 +148,17 @@
                     </div>
                 </div>
                 <!-- Las canciones se cargan dinámicamente aquí -->
+                <!-- Sección de comentarios, solo para playlists públicas -->
+                <div id="commentsSection" style="display:none; margin-top:32px;">
+                    <h4>Comentarios</h4>
+                    <div id="commentsList">
+                        <!-- Comentarios cargados dinámicamente -->
+                    </div>
+                    <form id="commentForm" style="margin-top:16px; display:flex; gap:8px;">
+                        <input type="text" id="commentInput" maxlength="500" placeholder="Escribe un comentario..." class="input" style="flex:1;">
+                        <button type="submit" class="btn-primary">Comentar</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
