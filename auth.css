@@ -32,7 +32,7 @@ body {
 /* Container principal */
 .auth-container {
     width: 100%;
-    max-width: 380px;
+    max-width: 520px; /* ✅ Aumentado para dos columnas */
     padding: 20px;
     position: relative;
 }
@@ -108,34 +108,43 @@ body {
     color: var(--spotify-white);
 }
 
-/* Grupos de input */
+/* ✅ NUEVO: Filas de formulario para dos columnas */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+/* Grupos de input - MÁS COMPACTOS */
 .input-group {
-    margin-bottom: 14px;
+    margin-bottom: 10px; /* ✅ Reducido de 14px a 10px */
 }
 
 .input-group label {
     display: block;
-    margin-bottom: 4px;
+    margin-bottom: 3px; /* ✅ Reducido de 4px a 3px */
     font-weight: 500;
     color: var(--spotify-white);
-    font-size: 13px;
+    font-size: 12px; /* ✅ Reducido de 13px a 12px */
 }
 
 .input-group input,
 .input-group select {
     width: 100%;
-    padding: 10px 12px;
+    padding: 12px 14px; /* ✅ Aumentado de 8px 10px a 12px 14px */
     border: 2px solid var(--spotify-gray);
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.05);
     color: var(--spotify-white);
-    font-size: 14px;
+    font-size: 14px; /* ✅ Aumentado de 13px a 14px */
     transition: all 0.3s ease;
     font-family: inherit;
 }
 
 .input-group input::placeholder {
     color: var(--spotify-light-gray);
+    font-size: 13px; /* ✅ Aumentado de 12px a 13px */
 }
 
 .input-group input:focus,
@@ -153,22 +162,23 @@ body {
 .input-group select option {
     background: var(--spotify-dark-gray);
     color: var(--spotify-white);
-    padding: 10px;
+    padding: 10px; /* ✅ Aumentado de 8px a 10px */
+    font-size: 13px; /* ✅ Aumentado de 12px a 13px */
 }
 
 /* Botones */
 .btn-primary {
     width: 100%;
-    padding: 12px;
+    padding: 14px; /* ✅ Aumentado de 10px a 14px */
     background: var(--spotify-purple);
     color: var(--spotify-white);
     border: none;
     border-radius: 50px;
-    font-size: 14px;
+    font-size: 15px; /* ✅ Aumentado de 14px a 15px */
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-top: 6px;
+    margin-top: 10px; /* ✅ Aumentado de 8px a 10px */
     font-family: inherit;
 }
 
@@ -185,8 +195,8 @@ body {
 /* Footer de autenticación */
 .auth-footer {
     text-align: center;
-    margin-top: 16px;
-    padding-top: 16px;
+    margin-top: 12px; /* ✅ Reducido de 16px a 12px */
+    padding-top: 12px; /* ✅ Reducido de 16px a 12px */
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -222,13 +232,65 @@ body {
 
 .error-message {
     color: var(--error-color);
-    font-size: 12px;
+    font-size: 11px;
     margin-top: 4px;
     display: none;
 }
 
 .input-group.error .error-message {
     display: block;
+}
+
+/* ✅ NUEVO: Indicadores de validación de contraseña */
+.password-requirements {
+    margin-top: 6px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    border-left: 3px solid var(--spotify-purple);
+    display: none;
+}
+
+.password-requirements.show {
+    display: block;
+}
+
+.password-requirements h4 {
+    font-size: 12px;
+    color: var(--spotify-white);
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.requirement {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    margin-bottom: 3px;
+    color: var(--spotify-light-gray);
+    transition: color 0.3s ease;
+}
+
+.requirement.valid {
+    color: var(--success-color);
+}
+
+.requirement.invalid {
+    color: var(--error-color);
+}
+
+.requirement-icon {
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.requirement.valid .requirement-icon::before {
+    content: "✓";
+}
+
+.requirement.invalid .requirement-icon::before {
+    content: "✗";
 }
 
 /* Animaciones */
@@ -248,10 +310,16 @@ body {
 }
 
 /* Responsive */
-@media (max-width: 480px) {
+@media (max-width: 580px) {
     .auth-container {
         padding: 10px;
-        max-width: 340px;
+        max-width: 380px; /* ✅ Volver a tamaño original en móvil */
+    }
+    
+    /* ✅ Una sola columna en móvil */
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
     }
     
     .auth-card {
@@ -269,7 +337,7 @@ body {
     
     .input-group input,
     .input-group select {
-        padding: 10px 12px;
+        padding: 9px 12px; /* ✅ Poco más grande en móvil */
         font-size: 14px;
     }
     
@@ -281,6 +349,17 @@ body {
     .btn-back {
         font-size: 12px;
         padding: 6px 10px;
+    }
+}
+
+/* ✅ Responsive para tablets */
+@media (max-width: 768px) and (min-width: 581px) {
+    .auth-container {
+        max-width: 480px;
+    }
+    
+    .form-row {
+        gap: 10px;
     }
 }
 

@@ -47,45 +47,111 @@
             <div id="registerForm" class="form-container hidden">
                 <h2>Registrarse</h2>
                 <form>
-                    <div class="input-group">
-                        <label for="registerUser">Usuario</label>
-                        <input type="text" id="registerUser" name="usuario" placeholder="Tu nickname único" required>
+                    <!-- Primera fila - Dos columnas -->
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="registerUser">Usuario</label>
+                            <input type="text" id="registerUser" name="usuario" placeholder="Tu nickname" required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="registerName">Nombre</label>
+                            <input type="text" id="registerName" name="nombre" placeholder="Nombre completo" required>
+                        </div>
                     </div>
                     
-                    <div class="input-group">
-                        <label for="registerName">Nombre</label>
-                        <input type="text" id="registerName" name="nombre" placeholder="Tu nombre completo" required>
+                    <!-- Segunda fila - Dos columnas -->
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="registerPassword">Contraseña</label>
+                            <input type="password" id="registerPassword" name="password" placeholder="Min. 8 caracteres" required>
+                            <!-- ✅ NUEVO: Contenedor para requisitos de contraseña -->
+                            <div id="passwordRequirements" class="password-requirements">
+                                <h4>Requisitos de contraseña:</h4>
+                                <div class="requirement" id="req-length">
+                                    <span class="requirement-icon"></span>
+                                    <span>Mínimo 8 caracteres</span>
+                                </div>
+                                <div class="requirement" id="req-uppercase">
+                                    <span class="requirement-icon"></span>
+                                    <span>Una mayúscula (A-Z)</span>
+                                </div>
+                                <div class="requirement" id="req-lowercase">
+                                    <span class="requirement-icon"></span>
+                                    <span>Una minúscula (a-z)</span>
+                                </div>
+                                <div class="requirement" id="req-number">
+                                    <span class="requirement-icon"></span>
+                                    <span>Un número (0-9)</span>
+                                </div>
+                                <div class="requirement" id="req-special">
+                                    <span class="requirement-icon"></span>
+                                    <span>Un carácter especial (@$!%*?&)</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="confirmPassword">Confirmar</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Min. 8 caracteres" required>
+                        </div>
                     </div>
                     
-                    <div class="input-group">
-                        <label for="registerPassword">Contraseña</label>
-                        <input type="password" id="registerPassword" name="password" placeholder="Mínimo 8 caracteres" required>
+                    <!-- Tercera fila - Dos columnas -->
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="studentCode">Código</label>
+                            <input type="text" id="studentCode" name="codigo" placeholder="Código estudiantil" required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="career">Carrera</label>
+                            <select id="career" name="carrera" required>
+                                <option value="">Selecciona carrera</option>
+                                <option value="Ingeniería de Sistemas">Ing. Sistemas</option>
+                                <option value="Ingeniería Electrónica">Ing. Electrónica</option>
+                                <option value="Ingeniería Eléctrica">Ing. Eléctrica</option>
+                                <option value="Ingeniería Industrial">Ing. Industrial</option>
+                                <option value="Ingeniería Civil">Ing. Civil</option>
+                                <option value="Ingeniería Catastral y Geodesia">Ing. Catastral</option>
+                                <option value="Ingeniería Ambiental">Ing. Ambiental</option>
+                                <option value="Ingeniería Mecánica">Ing. Mecánica</option>
+                                <option value="Ingeniería Topográfica">Ing. Topográfica</option>
+                            </select>
+                        </div>
                     </div>
                     
-                    <div class="input-group">
-                        <label for="confirmPassword">Confirmar Contraseña</label>
-                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Repite tu contraseña" required>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label for="studentCode">Código Estudiantil</label>
-                        <input type="text" id="studentCode" name="codigo" placeholder="Tu código de estudiante" required>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label for="career">Carrera</label>
-                        <select id="career" name="carrera" required>
-                            <option value="">Selecciona tu carrera</option>
-                            <option value="ing-sistemas">Ingeniería de Sistemas</option>
-                            <option value="ing-electronica">Ingeniería Electrónica</option>
-                            <option value="ing-electrica">Ingeniería Eléctrica</option>
-                            <option value="ing-industrial">Ingeniería Industrial</option>
-                            <option value="ing-civil">Ingeniería Civil</option>
-                            <option value="ing-catastral">Ingeniería Catastral y Geodesia</option>
-                            <option value="ing-ambiental">Ingeniería Ambiental</option>
-                            <option value="ing-mecanica">Ingeniería Mecánica</option>
-                            <option value="ing-topografica">Ingeniería Topográfica</option>
-                        </select>
+                    <!-- Cuarta fila - Dos columnas -->
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="city">Ciudad</label>
+                            <select id="city" name="ubicacion" required>
+                                <option value="">Selecciona ciudad</option>
+                                <option value="Bogotá D.C." selected>Bogotá D.C.</option>
+                                <option value="Medellín">Medellín</option>
+                                <option value="Cali">Cali</option>
+                                <option value="Barranquilla">Barranquilla</option>
+                                <option value="Cartagena">Cartagena</option>
+                                <option value="Bucaramanga">Bucaramanga</option>
+                                <option value="Pereira">Pereira</option>
+                                <option value="Santa Marta">Santa Marta</option>
+                                <option value="Ibagué">Ibagué</option>
+                                <option value="Manizales">Manizales</option>
+                                <option value="Villavicencio">Villavicencio</option>
+                                <option value="Pasto">Pasto</option>
+                                <option value="Neiva">Neiva</option>
+                                <option value="Armenia">Armenia</option>
+                                <option value="Valledupar">Valledupar</option>
+                                <option value="Montería">Montería</option>
+                                <option value="Popayán">Popayán</option>
+                                <option value="Tunja">Tunja</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" placeholder="tu@udistrital.edu.co" required>
+                        </div>
                     </div>
                     
                     <button type="submit" class="btn-primary">Registrarse</button>
