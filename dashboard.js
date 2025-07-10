@@ -903,6 +903,367 @@ document.addEventListener('DOMContentLoaded', function () {
 
     console.log('✅ Dashboard inicializado correctamente');
 });
+function showProfileModal() {
+    const modal = document.getElementById('profileModal');
+    if (!modal) {
+        console.error('Modal de perfil no encontrado');
+        return;
+    }
+
+    // Cargar datos actuales del usuario
+    loadCurrentUserData();
+    
+    // Mostrar modal
+    modal.style.display = 'block';
+}
+
+// ✅ FUNCIÓN PARA CARGAR DATOS ACTUALES DEL USUARIO
+function loadCurrentUserData() {
+    if (!currentUser) return;
+
+    // Cargar información básica
+    document.getElementById('editUserName').value = currentUser.nombre || '';
+    document.getElementById('editUserCareer').value = currentUser.carrera || '';
+    document.getElementById('editUserEmail').value = currentUser.email || '';
+    document.getElementById('profileImageUrl').value = currentUser.profileImageUrl || '';
+
+    // Actualizar avatar
+    updateAvatarPreview(currentUser.profileImageUrl);
+
+    // Cargar estadísticas
+    loadUserStatistics();
+}
+
+// ✅ FUNCIÓN PARA ACTUALIZAR PREVIEW DEL AVATAR
+function updateAvatarPreview(imageUrl) {
+    const avatarContainer = document.getElementById('currentAvatar');
+    
+    if (imageUrl && isValidUrl(imageUrl)) {
+        avatarContainer.innerHTML = `<img src="${imageUrl}" alt="Avatar" class="image-preview">`;
+    } else {
+        // Mostrar emoji o inicial del usuario
+        const initial = currentUser?.nombre ? currentUser.nombre.charAt(0).toUpperCase() : '👤';
+        avatarContainer.innerHTML = `<span class="material-icons">account_circle</span>`;
+    }
+}
+
+// ✅ FUNCIÓN PARA CARGAR ESTADÍSTICAS DEL USUARIO
+async function loadUserStatistics() {
+    if (!currentUser) return;
+
+    try {
+        // Cargar número de playlists
+        const playlistsResponse = await fetch(`${API_BASE_URL}/playlists/user/${currentUser.usuario}`);
+        if (playlistsResponse.ok) {
+            const playlists = await playlistsResponse.json();
+            document.getElementById('userPlaylistsCount').textContent = playlists.length;
+        }
+
+        // Cargar seguidores
+        try {
+            const followersResponse = await fetch(`${API_BASE_URL}/users/${currentUser.usuario}/followers`);
+            if (followersResponse.ok) {
+                const followers = await followersResponse.json();
+                document.getElementById('userFollowersCount').textContent = followers.length;
+            }
+        } catch (error) {
+            document.getElementById('userFollowersCount').textContent = '0';
+        }
+
+        // Cargar siguiendo
+        try {
+            const followingResponse = await fetch(`${API_BASE_URL}/users/${currentUser.usuario}/following`);
+            if (followingResponse.ok) {
+                const following = await followingResponse.json();
+                document.getElementById('userFollowingCount').textContent = following.length;
+            }
+        } catch (error) {
+            document.getElementById('userFollowingCount').textContent = '0';
+        }
+
+        // Fecha de registro (si está disponible)
+        const joinDate = currentUser.fechaRegistro ? 
+            new Date(currentUser.fechaRegistro).toLocaleDateString('es-ES', { 
+                year: 'numeric', 
+                month: 'short' 
+            }) : 'No disponible';
+        document.getElementById('userJoinDate').textContent = joinDate;
+
+    } catch (error) {
+        console.error('❌ Error loading user statistics:', error);
+    }
+}
+
+// ✅ FUNCIÓN PARA MANEJAR CAMBIOS EN LA URL DE LA IMAGEN
+function handleProfileImageChange() {
+    const imageUrl = document.getElementById('profileImageUrl').value.trim();
+    updateAvatarPreview(imageUrl);
+}
+
+// ✅ FUNCIÓN PARA QUITAR FOTO DE PERFIL
+function removeProfileImage() {
+    document.getElementById('profileImageUrl').value = '';
+    updateAvatarPreview('');
+}
+
+// ✅ FUNCIÓN PARA VALIDAR CONTRASEÑA
+function validatePassword(password) {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    const errors = [];
+    
+    if (password.length < minLength) {
+        errors.push(`Mínimo ${minLength} caracteres`);
+    }
+    if (!hasUpperCase) {
+        errors.push('Una letra mayúscula');
+    }
+    if (!hasLowerCase) {
+        errors.push('Una letra minúscula');
+    }
+    if (!hasNumbers) {
+        errors.push('Un número');
+    }
+    if (!hasSpecialChar) {
+        errors.push('Un carácter especial');
+    }
+
+    return {
+        isValid: errors.length === 0,
+        errors: errors
+    };
+}
+
+// ✅ FUNCIÓN PARA MOSTRAR ERRORES EN CAMPOS
+function showFieldError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    const existingError = field.parentNode.querySelector('.error-message');
+    
+    // Remover error anterior
+    if (existingError) {
+        existingError.remove();
+    }
+
+    // Agregar nueva clase de error
+    field.classList.add('error');
+    field.classList.remove('success');
+
+    // Agregar mensaje de error
+    if (message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.textContent = message;
+        field.parentNode.appendChild(errorDiv);
+    }
+}
+
+// ✅ FUNCIÓN PARA MOSTRAR ÉXITO EN CAMPOS
+function showFieldSuccess(fieldId) {
+    const field = document.getElementById(fieldId);
+    const existingError = field.parentNode.querySelector('.error-message');
+    
+    // Remover error anterior
+    if (existingError) {
+        existingError.remove();
+    }
+
+    // Agregar clase de éxito
+    field.classList.remove('error');
+    field.classList.add('success');
+}
+
+// ✅ FUNCIÓN PARA LIMPIAR ESTADO DE CAMPO
+function clearFieldState(fieldId) {
+    const field = document.getElementById(fieldId);
+    const existingError = field.parentNode.querySelector('.error-message');
+    
+    if (existingError) {
+        existingError.remove();
+    }
+
+    field.classList.remove('error', 'success');
+}
+
+// ✅ FUNCIÓN PARA MANEJAR ENVÍO DEL FORMULARIO DE PERFIL
+async function handleProfileFormSubmit(event) {
+    event.preventDefault();
+
+    const formData = {
+        nombre: document.getElementById('editUserName').value.trim(),
+        carrera: document.getElementById('editUserCareer').value.trim(),
+        email: document.getElementById('editUserEmail').value.trim(),
+        profileImageUrl: document.getElementById('profileImageUrl').value.trim()
+    };
+
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+
+    // Limpiar estados anteriores
+    ['editUserName', 'editUserCareer', 'editUserEmail', 'profileImageUrl', 'newPassword', 'confirmPassword'].forEach(clearFieldState);
+
+    let hasErrors = false;
+
+    // Validar campos obligatorios SOLO si están vacíos
+    if (!formData.nombre) {
+        showFieldError('editUserName', 'El nombre es obligatorio');
+        hasErrors = true;
+    }
+    if (!formData.carrera) {
+        showFieldError('editUserCareer', 'La carrera es obligatoria');
+        hasErrors = true;
+    }
+    if (!formData.email) {
+        showFieldError('editUserEmail', 'El email es obligatorio');
+        hasErrors = true;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        showFieldError('editUserEmail', 'Email no válido');
+        hasErrors = true;
+    }
+    // Validar URL de imagen si se proporciona
+    if (formData.profileImageUrl && !isValidUrl(formData.profileImageUrl)) {
+        showFieldError('profileImageUrl', 'URL de imagen no válida');
+        hasErrors = true;
+    }
+
+    // Validar cambio de contraseña SOLO si se intenta cambiar
+    if (newPassword || confirmPassword) {
+        if (!newPassword) {
+            showFieldError('newPassword', 'Ingresa la nueva contraseña');
+            hasErrors = true;
+        } else {
+            const passwordValidation = validatePassword(newPassword);
+            if (!passwordValidation.isValid) {
+                showFieldError('newPassword', `Falta: ${passwordValidation.errors.join(', ')}`);
+                hasErrors = true;
+            }
+        }
+        if (newPassword !== confirmPassword) {
+            showFieldError('confirmPassword', 'Las contraseñas no coinciden');
+            hasErrors = true;
+        }
+    }
+
+    if (hasErrors) {
+        showMessage('Por favor corrige los errores antes de continuar', 'error');
+        return;
+    }
+
+    // Mostrar estado de carga
+    const avatarSection = document.querySelector('.profile-avatar-section');
+    avatarSection.classList.add('loading');
+
+    try {
+        // Actualizar información básica
+        const updateData = {
+            ...currentUser,
+            ...formData
+        };
+
+        // Solo incluir cambio de contraseña si se está cambiando
+        if (newPassword) {
+            updateData.newPassword = newPassword;
+        }
+
+        // Enviar solo los datos necesarios
+        const response = await fetch(`${API_BASE_URL}/users/${currentUser.usuario}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updateData)
+        });
+
+        if (response.ok) {
+            const updatedUser = await response.json();
+            // Actualizar usuario actual
+            currentUser = { ...currentUser, ...updatedUser };
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            // Actualizar UI
+            loadUserInfo();
+            updateAvatarPreview(currentUser.profileImageUrl);
+            // Mostrar éxito
+            showMessage('Perfil actualizado exitosamente', 'success');
+            // Cerrar modal después de un delay
+            setTimeout(() => {
+                document.getElementById('profileModal').style.display = 'none';
+            }, 1500);
+        } else {
+            const errorData = await response.text();
+            showMessage(errorData || 'Error al actualizar perfil', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Error updating profile:', error);
+        showMessage('Error de conexión', 'error');
+    } finally {
+        // Quitar estado de carga
+        avatarSection.classList.remove('loading');
+    }
+}
+
+// ✅ FUNCIÓN PARA CERRAR MODAL DE PERFIL
+function closeProfileModal() {
+    const modal = document.getElementById('profileModal');
+    modal.style.display = 'none';
+    
+    // Limpiar formulario
+    document.getElementById('profileForm').reset();
+    
+    // Limpiar estados de validación
+    ['editUserName', 'editUserCareer', 'editUserEmail', 'profileImageUrl', 'newPassword', 'confirmPassword'].forEach(clearFieldState);
+}
+
+// ✅ AGREGAR EVENT LISTENERS AL FINAL DEL DOMContentLoaded EN dashboard.js
+
+// Event listeners para modal de perfil
+const btnProfile = document.getElementById('btnProfile');
+if (btnProfile) {
+    btnProfile.addEventListener('click', showProfileModal);
+}
+
+// Modal de perfil
+const profileModal = document.getElementById('profileModal');
+const closeProfileBtn = document.getElementById('closeProfileModal');
+const cancelProfileEdit = document.getElementById('cancelProfileEdit');
+
+if (closeProfileBtn) {
+    closeProfileBtn.addEventListener('click', closeProfileModal);
+}
+
+if (cancelProfileEdit) {
+    cancelProfileEdit.addEventListener('click', () => {
+        profileModal.style.display = 'none';
+    });
+}
+
+if (profileModal) {
+    profileModal.addEventListener('click', (e) => {
+        if (e.target === profileModal) {
+            profileModal.style.display = 'none';
+        }
+    });
+}
+
+// Formulario de perfil
+const profileForm = document.getElementById('profileForm');
+if (profileForm) {
+    profileForm.addEventListener('submit', handleProfileFormSubmit);
+}
+
+// Preview de imagen en tiempo real
+const profileImageUrl = document.getElementById('profileImageUrl');
+if (profileImageUrl) {
+    profileImageUrl.addEventListener('input', handleProfileImageChange);
+}
+
+// Botón para quitar imagen
+const removeProfileImageBtn = document.getElementById('removeProfileImage');
+if (removeProfileImageBtn) {
+    removeProfileImageBtn.addEventListener('click', removeProfileImage);
+}
 
 // FUNCIONES GLOBALES
 window.viewPlaylistDetails = viewPlaylistDetails;

@@ -1329,3 +1329,332 @@ body {
     background: linear-gradient(145deg, rgba(26, 26, 26, 0.9) 0%, rgba(45, 27, 105, 0.3) 1%, rgba(26, 26, 26, 0.9) 100%);
     backdrop-filter: blur(20px);
 }
+/* ✅ CSS PARA MODAL DE PERFIL - Agregar al dashboard.css */
+
+/* Sección de Avatar */
+.profile-avatar-section {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 32px;
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.current-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--spotify-purple) 0%, var(--distrital-gold) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
+    color: var(--spotify-white);
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.current-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.current-avatar .material-icons {
+    font-size: 60px;
+}
+
+.avatar-options {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.avatar-options h4 {
+    color: var(--spotify-white);
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+/* Secciones del formulario */
+.form-section {
+    margin-bottom: 32px;
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.form-section h4 {
+    color: var(--spotify-white);
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-section h4::before {
+    content: '';
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(135deg, var(--spotify-purple) 0%, var(--distrital-gold) 100%);
+    border-radius: 2px;
+}
+
+/* Form groups mejorados para el perfil */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--spotify-white);
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="url"] {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--spotify-white);
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="email"]:focus,
+.form-group input[type="password"]:focus,
+.form-group input[type="url"]:focus {
+    outline: none;
+    border-color: var(--spotify-purple);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+}
+
+.form-group input::placeholder {
+    color: var(--spotify-light-gray);
+}
+
+.form-group small {
+    display: block;
+    margin-top: 4px;
+    color: var(--spotify-light-gray);
+    font-size: 12px;
+}
+
+/* Grid de estadísticas */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.stat-number {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--spotify-purple);
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--spotify-light-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Botón para quitar foto */
+#removeProfileImage {
+    align-self: flex-start;
+    padding: 8px 16px;
+    font-size: 13px;
+}
+
+#removeProfileImage .material-icons {
+    font-size: 18px;
+}
+
+/* Acciones del modal mejoradas */
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-actions .btn-primary {
+    background: linear-gradient(135deg, var(--spotify-purple) 0%, var(--spotify-dark-purple) 100%);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+.modal-actions .btn-primary:hover {
+    background: linear-gradient(135deg, var(--spotify-dark-purple) 0%, #6d28d9 100%);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+    transform: translateY(-2px);
+}
+
+/* Validación visual */
+.form-group input.error {
+    border-color: var(--error-color);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.form-group input.success {
+    border-color: var(--success-color);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.form-group .error-message {
+    color: var(--error-color);
+    font-size: 12px;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.form-group .error-message::before {
+    content: '⚠️';
+    font-size: 12px;
+}
+
+/* Preview de imagen */
+.image-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Estados de carga */
+.profile-avatar-section.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.profile-avatar-section.loading .current-avatar::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 24px;
+    height: 24px;
+    margin: -12px 0 0 -12px;
+    border: 3px solid var(--spotify-light-gray);
+    border-top-color: var(--spotify-purple);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Responsive para el modal de perfil */
+@media (max-width: 768px) {
+    .profile-avatar-section {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 20px;
+    }
+    
+    .current-avatar {
+        width: 100px;
+        height: 100px;
+        font-size: 50px;
+    }
+    
+    .current-avatar .material-icons {
+        font-size: 50px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    
+    .stat-card {
+        padding: 16px;
+    }
+    
+    .stat-number {
+        font-size: 20px;
+    }
+    
+    .form-section {
+        padding: 16px;
+        margin-bottom: 20px;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .modal-actions .btn-primary,
+    .modal-actions .btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .current-avatar {
+        width: 80px;
+        height: 80px;
+        font-size: 40px;
+    }
+    
+    .current-avatar .material-icons {
+        font-size: 40px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .stat-card {
+        padding: 12px;
+    }
+    
+    .stat-number {
+        font-size: 18px;
+    }
+}

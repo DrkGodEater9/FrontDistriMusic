@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DistriMusic - Dashboard</title>
     <link rel="stylesheet" href="dashboard.css">
-    <link href="https://fonts.googleapis.com/css2?family=Circular:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Circular:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
+
 <body>
     <!-- Header/Navbar -->
     <header class="header">
@@ -53,7 +56,8 @@
 
                 <!-- Barra de búsqueda -->
                 <div class="search-container">
-                    <input type="text" id="searchInput" placeholder="Buscar canciones, artistas, álbumes..." class="search-input">
+                    <input type="text" id="searchInput" placeholder="Buscar canciones, artistas, álbumes..."
+                        class="search-input">
                     <button class="btn-search" id="btnSearch">
                         <span class="material-icons">search</span>
                     </button>
@@ -145,7 +149,107 @@
             </div>
         </div>
     </div>
-    
+    <!-- Modal para editar perfil - Agregar al dashboard.html antes del cierre del body -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Editar Perfil</h3>
+                <span class="close" id="closeProfileModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="profileForm">
+                    <!-- Sección de Foto de Perfil -->
+                    <div class="profile-avatar-section">
+                        <div class="current-avatar" id="currentAvatar">
+                            <span class="material-icons">account_circle</span>
+                        </div>
+                        <div class="avatar-options">
+                            <h4>Foto de Perfil</h4>
+                            <div class="form-group">
+                                <label for="profileImageUrl">URL de la imagen (opcional)</label>
+                                <input type="url" id="profileImageUrl" placeholder="https://ejemplo.com/mi-foto.jpg">
+                                <small>Agrega un enlace a una imagen para tu foto de perfil</small>
+                            </div>
+                            <button type="button" class="btn-secondary" id="removeProfileImage">
+                                <span class="material-icons">delete</span>
+                                Quitar foto
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Información Personal -->
+                    <div class="form-section">
+                        <h4>Información Personal</h4>
+                        <div class="form-group">
+                            <label for="editUserName">Nombre completo</label>
+                            <input type="text" id="editUserName" required placeholder="Tu nombre completo">
+                        </div>
+                        <div class="form-group">
+                            <label for="editUserCareer">Carrera</label>
+                            <input type="text" id="editUserCareer" required placeholder="Tu carrera">
+                        </div>
+                        <div class="form-group">
+                            <label for="editUserEmail">Email</label>
+                            <input type="email" id="editUserEmail" required placeholder="tu@email.com">
+                        </div>
+                    </div>
+
+                    <!-- Cambio de Contraseña -->
+                    <div class="form-section">
+                        <h4>Cambiar Contraseña</h4>
+                        <div class="form-group">
+                            <label for="currentPassword">Contraseña actual</label>
+                            <input type="password" id="currentPassword" placeholder="Tu contraseña actual">
+                            <small>Déjalo vacío si no quieres cambiar la contraseña</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword">Nueva contraseña</label>
+                            <input type="password" id="newPassword" placeholder="Nueva contraseña">
+                            <small>Mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter
+                                especial</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirmar nueva contraseña</label>
+                            <input type="password" id="confirmPassword" placeholder="Confirma tu nueva contraseña">
+                        </div>
+                    </div>
+
+                    <!-- Estadísticas del Usuario (Solo lectura) -->
+                    <div class="form-section">
+                        <h4>Estadísticas</h4>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <span class="stat-number" id="userPlaylistsCount">0</span>
+                                <span class="stat-label">Playlists creadas</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-number" id="userFollowersCount">0</span>
+                                <span class="stat-label">Seguidores</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-number" id="userFollowingCount">0</span>
+                                <span class="stat-label">Siguiendo</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-number" id="userJoinDate">-</span>
+                                <span class="stat-label">Miembro desde</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" id="cancelProfileEdit">Cancelar</button>
+                        <button type="submit" class="btn-primary">
+                            <span class="material-icons">save</span>
+                            Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="dashboard.js"></script>
 </body>
+
 </html>
