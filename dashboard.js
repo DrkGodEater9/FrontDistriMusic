@@ -1,10 +1,11 @@
-// DistriMusic - Dashboard JavaScript FUNCIONAL
+// DistriMusic - Dashboard JavaScript FUNCIONAL con Canciones
 
 // URL base de la API
 const API_BASE_URL = 'http://localhost:8090/api';
 
 // Variable global para el usuario actual
 let currentUser = null;
+let selectedPlaylistForSongs = null;
 
 // ✅ FUNCIÓN PARA VERIFICAR AUTENTICACIÓN
 function checkAuthentication() {
@@ -143,9 +144,9 @@ function renderPlaylists(playlists, container, isOwner = false) {
         const createdDate = playlist.fechaCreacion ? 
             new Date(playlist.fechaCreacion).toLocaleDateString('es-ES') : 'Fecha desconocida';
         
-        // Usar imagen personalizada si existe
+        // Usar imagen personalizada si existe, sino usar emoji por defecto
         const imageContent = playlist.imageUrl ? 
-            `<img src="${playlist.imageUrl}" alt="${playlist.nombre}" style="width: 100%; height: 100%; object-fit: cover;">` :
+            `<img src="${playlist.imageUrl}" alt="${playlist.nombre}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">` :
             '🎵';
         
         return `
@@ -170,9 +171,227 @@ function renderPlaylists(playlists, container, isOwner = false) {
     container.innerHTML = playlistsHTML;
 }
 
-// ✅ FUNCIÓN PARA VER DETALLES DE PLAYLIST
-function viewPlaylistDetails(playlistId) {
-    showMessage(`Ver detalles de playlist ${playlistId} (funcionalidad en desarrollo)`, 'info');
+// ✅ FUNCIÓN PARA VER DETALLES DE PLAYLIST CON CANCIONES
+async function viewPlaylistDetails(playlistId) {
+    try {
+        // Cargar datos de la playlist
+        const playlistResponse = await fetch(`${API_BASE_URL}/playlists/${playlistId}`);
+        if (!playlistResponse.ok) {
+            showMessage('Error cargando la playlist', 'error');
+            return;
+        }
+        
+        const playlist = await playlistResponse.json();
+        
+        // Cargar canciones de la playlist
+        const songsResponse = await fetch(`${API_BASE_URL}/playlists/${playlistId}/songs`);
+        let songs = [];
+        if (songsResponse.ok) {
+            songs = await songsResponse.json();
+        }
+        
+        // Mostrar modal con detalles
+        showPlaylistDetailModal(playlist, songs);
+        
+    } catch (error) {
+        console.error('❌ Error loading playlist details:', error);
+        showMessage('Error de conexión', 'error');
+    }
+}
+
+// ✅ FUNCIÓN PARA MOSTRAR MODAL DE DETALLES DE PLAYLIST
+function showPlaylistDetailModal(playlist, songs) {
+    const modal = document.getElementById('playlistDetailModal');
+    const titleElement = document.getElementById('detailPlaylistName');
+    const ownerElement = document.getElementById('detailPlaylistOwner');
+    const dateElement = document.getElementById('detailPlaylistDate');
+    const typeElement = document.getElementById('detailPlaylistType');
+    
+    if (titleElement) titleElement.textContent = playlist.nombre;
+    if (ownerElement) ownerElement.textContent = `Por: ${playlist.usuario?.nombre || 'Usuario desconocido'}`;
+    if (dateElement) {
+        const date = playlist.fechaCreacion ? 
+            new Date(playlist.fechaCreacion).toLocaleDateString('es-ES') : 'Fecha desconocida';
+        dateElement.textContent = `Creada el: ${date}`;
+    }
+    if (typeElement) typeElement.textContent = `Tipo: ${playlist.esPublica ? 'Pública' : 'Privada'}`;
+    
+    // Agregar lista de canciones
+    const contentArea = modal.querySelector('.playlist-detail-content');
+    const songsHTML = songs.length > 0 ? `
+        <div class="playlist-songs">
+            <h4>Canciones (${songs.length})</h4>
+            <div class="songs-list">
+                ${songs.map(song => `
+                    <div class="song-item">
+                        <div class="song-cover">
+                            ${song.imageUrl ? 
+                                `<img src="${song.imageUrl}" alt="${song.titulo}" style="width: 50px; height: 50px; border-radius: 6px; object-fit: cover;">` :
+                                '<div style="width: 50px; height: 50px; background: linear-gradient(135deg, var(--spotify-purple), var(--distrital-gold)); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">🎵</div>'
+                            }
+                        </div>
+                        <div class="song-info">
+                            <h5>${song.titulo}</h5>
+                            <p>${song.artista} - ${song.album}</p>
+                        </div>
+                        ${currentUser && playlist.usuario?.usuario === currentUser.usuario ? 
+                            `<button class="btn-remove-song" onclick="removeSongFromPlaylist(${playlist.id}, ${song.id})">
+                                <span class="material-icons">remove</span>
+                            </button>` : ''
+                        }
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    ` : '<div class="empty-songs"><p>Esta playlist no tiene canciones aún</p></div>';
+    
+    // Agregar botón para agregar canciones si es el propietario
+    const addSongsButton = currentUser && playlist.usuario?.usuario === currentUser.usuario ? `
+        <div class="playlist-actions">
+            <button class="btn-primary" onclick="showAddSongsModal(${playlist.id})">
+                <span class="material-icons">add</span>
+                Agregar Canciones
+            </button>
+        </div>
+    ` : '';
+    
+    // Actualizar el contenido del modal
+    const existingPlaylistInfo = contentArea.querySelector('.playlist-info');
+    if (existingPlaylistInfo) {
+        existingPlaylistInfo.insertAdjacentHTML('afterend', songsHTML + addSongsButton);
+    }
+    
+    modal.style.display = 'block';
+    selectedPlaylistForSongs = playlist.id;
+}
+
+// ✅ FUNCIÓN PARA MOSTRAR MODAL DE AGREGAR CANCIONES
+async function showAddSongsModal(playlistId) {
+    try {
+        // Cargar todas las canciones disponibles
+        const response = await fetch(`${API_BASE_URL}/music`);
+        if (!response.ok) {
+            showMessage('Error cargando canciones', 'error');
+            return;
+        }
+        
+        const allSongs = await response.json();
+        
+        // Crear modal dinámico
+        const modalHTML = `
+            <div id="addSongsModal" class="modal" style="display: block;">
+                <div class="modal-content large">
+                    <div class="modal-header">
+                        <h3>Agregar Canciones a la Playlist</h3>
+                        <span class="close" onclick="closeAddSongsModal()">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <div class="search-container">
+                            <input type="text" id="songSearchInput" placeholder="Buscar canciones..." class="search-input">
+                        </div>
+                        <div class="available-songs">
+                            ${allSongs.map(song => `
+                                <div class="song-item selectable" data-song-id="${song.id}">
+                                    <div class="song-cover">
+                                        ${song.imageUrl ? 
+                                            `<img src="${song.imageUrl}" alt="${song.titulo}" style="width: 50px; height: 50px; border-radius: 6px; object-fit: cover;">` :
+                                            '<div style="width: 50px; height: 50px; background: linear-gradient(135deg, var(--spotify-purple), var(--distrital-gold)); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">🎵</div>'
+                                        }
+                                    </div>
+                                    <div class="song-info">
+                                        <h5>${song.titulo}</h5>
+                                        <p>${song.artista} - ${song.album}</p>
+                                    </div>
+                                    <button class="btn-add-song" onclick="addSongToPlaylist(${playlistId}, ${song.id}, this)">
+                                        <span class="material-icons">add</span>
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Agregar modal al DOM
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        
+        // Agregar funcionalidad de búsqueda
+        const searchInput = document.getElementById('songSearchInput');
+        searchInput.addEventListener('input', filterSongs);
+        
+    } catch (error) {
+        console.error('❌ Error loading songs:', error);
+        showMessage('Error de conexión', 'error');
+    }
+}
+
+// ✅ FUNCIÓN PARA FILTRAR CANCIONES
+function filterSongs() {
+    const query = document.getElementById('songSearchInput').value.toLowerCase();
+    const songItems = document.querySelectorAll('.song-item.selectable');
+    
+    songItems.forEach(item => {
+        const title = item.querySelector('h5').textContent.toLowerCase();
+        const artist = item.querySelector('p').textContent.toLowerCase();
+        
+        if (title.includes(query) || artist.includes(query)) {
+            item.style.display = 'flex';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+// ✅ FUNCIÓN PARA AGREGAR CANCIÓN A PLAYLIST
+async function addSongToPlaylist(playlistId, songId, buttonElement) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/playlists/${playlistId}/songs/${songId}`, {
+            method: 'POST'
+        });
+        
+        if (response.ok) {
+            showMessage('Canción agregada exitosamente', 'success');
+            buttonElement.innerHTML = '<span class="material-icons">check</span>';
+            buttonElement.disabled = true;
+            buttonElement.classList.add('added');
+        } else {
+            const errorData = await response.json();
+            showMessage(errorData.error || 'Error agregando canción', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Error adding song to playlist:', error);
+        showMessage('Error de conexión', 'error');
+    }
+}
+
+// ✅ FUNCIÓN PARA REMOVER CANCIÓN DE PLAYLIST
+async function removeSongFromPlaylist(playlistId, songId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/playlists/${playlistId}/songs/${songId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            showMessage('Canción eliminada exitosamente', 'success');
+            // Recargar detalles de la playlist
+            viewPlaylistDetails(playlistId);
+        } else {
+            const errorData = await response.json();
+            showMessage(errorData.error || 'Error eliminando canción', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Error removing song from playlist:', error);
+        showMessage('Error de conexión', 'error');
+    }
+}
+
+// ✅ FUNCIÓN PARA CERRAR MODAL DE AGREGAR CANCIONES
+function closeAddSongsModal() {
+    const modal = document.getElementById('addSongsModal');
+    if (modal) {
+        modal.remove();
+    }
 }
 
 // ✅ FUNCIÓN PARA BUSCAR CANCIONES
@@ -216,11 +435,15 @@ function renderSearchResults(songs, container) {
     
     const songsHTML = songs.map(song => `
         <div class="result-item" onclick="selectSong(${song.id})">
-            <div class="result-cover">🎵</div>
+            <div class="result-cover">
+                ${song.imageUrl ? 
+                    `<img src="${song.imageUrl}" alt="${song.titulo}" style="width: 50px; height: 50px; border-radius: 6px; object-fit: cover;">` :
+                    '<div style="width: 50px; height: 50px; background: linear-gradient(135deg, var(--spotify-purple), var(--distrital-gold)); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">🎵</div>'
+                }
+            </div>
             <div class="result-info">
                 <h4>${song.titulo}</h4>
                 <p>${song.artista} - ${song.album}</p>
-                <small>❤️ ${song.likes} likes</small>
             </div>
         </div>
     `).join('');
@@ -233,7 +456,7 @@ function renderSearchResults(songs, container) {
 
 // ✅ FUNCIÓN PARA SELECCIONAR CANCIÓN
 function selectSong(songId) {
-    showMessage(`Canción ${songId} seleccionada (funcionalidad en desarrollo)`, 'info');
+    showMessage(`Canción seleccionada. Funcionalidad en desarrollo para reproducir.`, 'info');
 }
 
 // ✅ FUNCIÓN PARA CREAR PLAYLIST
@@ -453,7 +676,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Modal
+    // Modal playlist
     const playlistModal = document.getElementById('playlistModal');
     const closeModal = document.getElementById('closeModal');
     const cancelModal = document.getElementById('cancelModal');
@@ -474,6 +697,30 @@ document.addEventListener('DOMContentLoaded', function() {
         playlistModal.addEventListener('click', (e) => {
             if (e.target === playlistModal) {
                 playlistModal.style.display = 'none';
+            }
+        });
+    }
+    
+    // Modal detalles de playlist
+    const detailModal = document.getElementById('playlistDetailModal');
+    const closeDetailModal = document.getElementById('closeDetailModal');
+    
+    if (closeDetailModal) {
+        closeDetailModal.addEventListener('click', () => {
+            detailModal.style.display = 'none';
+            // Limpiar contenido dinámico
+            const dynamicContent = detailModal.querySelectorAll('.playlist-songs, .playlist-actions, .empty-songs');
+            dynamicContent.forEach(el => el.remove());
+        });
+    }
+    
+    if (detailModal) {
+        detailModal.addEventListener('click', (e) => {
+            if (e.target === detailModal) {
+                detailModal.style.display = 'none';
+                // Limpiar contenido dinámico
+                const dynamicContent = detailModal.querySelectorAll('.playlist-songs, .playlist-actions, .empty-songs');
+                dynamicContent.forEach(el => el.remove());
             }
         });
     }
@@ -519,43 +766,6 @@ document.addEventListener('DOMContentLoaded', function() {
         btnRefreshExplorar.addEventListener('click', loadPublicPlaylists);
     }
     
-    // Agregar estilos CSS
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideInRight {
-            from { opacity: 0; transform: translateX(100%); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        
-        @keyframes slideOutRight {
-            from { opacity: 1; transform: translateX(0); }
-            to { opacity: 0; transform: translateX(100%); }
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--spotify-light-gray);
-            grid-column: 1 / -1;
-        }
-        
-        .empty-state h3 {
-            margin-bottom: 8px;
-            color: var(--spotify-white);
-            font-size: 18px;
-        }
-        
-        .playlist-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
-        }
-        
-        .result-item:hover {
-            background: rgba(139, 92, 246, 0.1);
-        }
-    `;
-    document.head.appendChild(style);
-    
     console.log('✅ Dashboard inicializado correctamente');
 });
 
@@ -563,3 +773,7 @@ document.addEventListener('DOMContentLoaded', function() {
 window.viewPlaylistDetails = viewPlaylistDetails;
 window.selectSong = selectSong;
 window.showSection = showSection;
+window.showAddSongsModal = showAddSongsModal;
+window.addSongToPlaylist = addSongToPlaylist;
+window.removeSongFromPlaylist = removeSongFromPlaylist;
+window.closeAddSongsModal = closeAddSongsModal;

@@ -693,4 +693,445 @@ body {
         flex-direction: column;
         gap: 12px;
     }
+    /* dashboard-songs.css - Estilos adicionales para funcionalidades de canciones */
+
+/* Song Items */
+.song-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.song-item:hover {
+    background: rgba(139, 92, 246, 0.1);
+    transform: translateX(4px);
+    border-color: var(--spotify-purple);
+}
+
+.song-item.selectable {
+    cursor: pointer;
+}
+
+.song-cover {
+    flex-shrink: 0;
+}
+
+.song-info {
+    flex: 1;
+}
+
+.song-info h5 {
+    margin-bottom: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--spotify-white);
+}
+
+.song-info p {
+    color: var(--spotify-light-gray);
+    font-size: 12px;
+    margin: 0;
+}
+
+/* Botones de acción para canciones */
+.btn-add-song, .btn-remove-song {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+}
+
+.btn-add-song {
+    background: var(--spotify-purple);
+    color: var(--spotify-white);
+}
+
+.btn-add-song:hover {
+    background: var(--spotify-dark-purple);
+    transform: scale(1.1);
+}
+
+.btn-add-song.added {
+    background: var(--success-color);
+    cursor: not-allowed;
+}
+
+.btn-remove-song {
+    background: var(--error-color);
+    color: var(--spotify-white);
+}
+
+.btn-remove-song:hover {
+    background: #dc2626;
+    transform: scale(1.1);
+}
+
+/* Lista de canciones en playlist */
+.playlist-songs {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.playlist-songs h4 {
+    margin-bottom: 16px;
+    color: var(--spotify-white);
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.songs-list {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.songs-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.songs-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.songs-list::-webkit-scrollbar-thumb {
+    background: var(--spotify-purple);
+    border-radius: 3px;
+}
+
+.songs-list::-webkit-scrollbar-thumb:hover {
+    background: var(--spotify-dark-purple);
+}
+
+/* Estado vacío para canciones */
+.empty-songs {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--spotify-light-gray);
+    margin-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.empty-songs p {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+/* Acciones de playlist */
+.playlist-actions {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+/* Modal de agregar canciones */
+.modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 0;
+}
+
+.available-songs {
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 16px;
+    margin-top: 16px;
+}
+
+.available-songs::-webkit-scrollbar {
+    width: 8px;
+}
+
+.available-songs::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.available-songs::-webkit-scrollbar-thumb {
+    background: var(--spotify-purple);
+    border-radius: 4px;
+}
+
+.available-songs::-webkit-scrollbar-thumb:hover {
+    background: var(--spotify-dark-purple);
+}
+
+/* Mejorar la apariencia de las imágenes */
+.playlist-cover img, .result-cover img, .song-cover img {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.playlist-card:hover .playlist-cover img {
+    transform: scale(1.05);
+}
+
+/* Placeholder para imágenes que no cargan */
+.image-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--spotify-purple) 0%, var(--distrital-gold) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--spotify-white);
+    font-size: 24px;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.image-placeholder::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* Mejorar resultados de búsqueda */
+.result-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.result-item:hover {
+    background: rgba(139, 92, 246, 0.1);
+    transform: translateX(4px);
+    border-color: var(--spotify-purple);
+}
+
+.result-cover {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.result-info {
+    flex: 1;
+}
+
+.result-info h4 {
+    margin-bottom: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--spotify-white);
+}
+
+.result-info p {
+    color: var(--spotify-light-gray);
+    font-size: 12px;
+    margin: 0;
+}
+
+/* Estados de carga */
+.loading-songs {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    color: var(--spotify-light-gray);
+}
+
+.loading-songs::after {
+    content: '';
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--spotify-light-gray);
+    border-top-color: var(--spotify-purple);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 8px;
+}
+
+/* Mejorar modal de detalles */
+.modal-content.large {
+    max-width: 900px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    flex-shrink: 0;
+}
+
+.playlist-detail-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 4px;
+}
+
+.playlist-detail-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.playlist-detail-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.playlist-detail-content::-webkit-scrollbar-thumb {
+    background: var(--spotify-purple);
+    border-radius: 3px;
+}
+
+/* Información de la playlist en el modal */
+.playlist-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    color: var(--spotify-light-gray);
+}
+
+.playlist-meta span {
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+}
+
+/* Animaciones suaves */
+.song-item, .result-item {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Hover effects mejorados */
+.playlist-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.playlist-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--spotify-purple), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    border-radius: 12px;
+}
+
+.playlist-card:hover::before {
+    opacity: 0.1;
+}
+
+/* Badges para tipos de playlist */
+.playlist-type.public {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--success-color);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.playlist-type.private {
+    background: rgba(107, 114, 128, 0.2);
+    color: var(--spotify-light-gray);
+    border: 1px solid rgba(107, 114, 128, 0.3);
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .song-item {
+        padding: 8px;
+        gap: 12px;
+    }
+    
+    .song-info h5 {
+        font-size: 13px;
+    }
+    
+    .song-info p {
+        font-size: 11px;
+    }
+    
+    .btn-add-song, .btn-remove-song {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+    
+    .modal-content.large {
+        width: 95%;
+        max-height: 85vh;
+        margin: 5% auto;
+    }
+    
+    .songs-list {
+        max-height: 300px;
+    }
+    
+    .available-songs {
+        max-height: 350px;
+        padding: 12px;
+    }
+    
+    .playlist-meta {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .playlist-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+}
 }
