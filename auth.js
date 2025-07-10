@@ -1,4 +1,7 @@
-// DistriMusic - JavaScript de Autenticación (Solo Visual)
+// DistriMusic - JavaScript de Autenticación FUNCIONAL con Backend
+
+// URL base de la API
+const API_BASE_URL = 'http://localhost:8090/api';
 
 // Función para alternar entre login y registro
 function toggleForm() {
@@ -18,89 +21,242 @@ function toggleForm() {
     }
 }
 
-// Detectar si viene desde un enlace específico
-document.addEventListener('DOMContentLoaded', function() {
-    // Verificar parámetros URL para determinar qué formulario mostrar
-    const urlParams = new URLSearchParams(window.location.search);
-    const action = urlParams.get('action');
+// ✅ FUNCIÓN PARA LOGIN CON FETCH
+async function handleLogin(event) {
+    event.preventDefault();
     
-    if (action === 'register') {
-        toggleForm(); // Mostrar formulario de registro
+    const usuario = document.getElementById('loginUser').value.trim();
+    const contraseña = document.getElementById('loginPassword').value;
+    const button = event.target.querySelector('.btn-primary');
+    
+    // Validación básica
+    if (!usuario || !contraseña) {
+        showMessage('Por favor completa todos los campos', 'error');
+        return;
     }
     
-    // Efectos visuales para los inputs
-    const inputs = document.querySelectorAll('input, select');
+    // Mostrar estado de carga
+    button.classList.add('loading');
+    button.disabled = true;
     
-    inputs.forEach(input => {
-        // Efecto de focus
-        input.addEventListener('focus', function() {
-            this.parentElement.classList.add('focused');
+    try {
+        const response = await fetch(`${API_BASE_URL}/users/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                usuario: usuario,
+                contraseña: contraseña
+            })
         });
         
-        // Efecto de blur
-        input.addEventListener('blur', function() {
-            this.parentElement.classList.remove('focused');
+        if (response.ok) {
+            const userData = await response.json();
             
-            // Validación visual básica (sin funcionalidad)
-            if (this.value.trim() !== '') {
-                this.parentElement.classList.add('filled');
-            } else {
-                this.parentElement.classList.remove('filled');
-            }
-        });
-        
-        // Efecto de typing
-        input.addEventListener('input', function() {
-            if (this.value.trim() !== '') {
-                this.parentElement.classList.add('filled');
-            } else {
-                this.parentElement.classList.remove('filled');
-            }
-        });
-    });
-    
-    // Prevenir envío de formularios (no hacer nada por ahora)
-    const forms = document.querySelectorAll('form');
-    forms.forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
+            // Guardar datos del usuario en localStorage
+            localStorage.setItem('currentUser', JSON.stringify(userData));
+            localStorage.setItem('isLoggedIn', 'true');
             
-            // Solo efecto visual del botón
-            const button = this.querySelector('.btn-primary');
-            button.classList.add('loading');
+            showMessage('¡Inicio de sesión exitoso!', 'success');
             
-            // Remover estado loading después de 2 segundos
+            // Redirigir al dashboard después de 1 segundo
             setTimeout(() => {
-                button.classList.remove('loading');
-            }, 2000);
-        });
-    });
-    
-    // Animación de entrada
-    const authCard = document.querySelector('.auth-card');
-    authCard.style.opacity = '0';
-    authCard.style.transform = 'translateY(20px)';
-    
-    setTimeout(() => {
-        authCard.style.transition = 'all 0.6s ease';
-        authCard.style.opacity = '1';
-        authCard.style.transform = 'translateY(0)';
-    }, 100);
-});
+                window.location.href = 'dashboard.html';
+            }, 1000);
+            
+        } else {
+            const errorData = await response.text();
+            let errorMessage = 'Error al iniciar sesión';
+            
+            if (response.status === 404) {
+                errorMessage = 'Usuario no encontrado';
+            } else if (response.status === 400) {
+                errorMessage = 'Credenciales incorrectas';
+            } else if (errorData) {
+                errorMessage = errorData;
+            }
+            
+            showMessage(errorMessage, 'error');
+        }
+        
+    } catch (error) {
+        console.error('Error en login:', error);
+        showMessage('Error de conexión. Verifica que el servidor esté ejecutándose.', 'error');
+    } finally {
+        // Remover estado de carga
+        button.classList.remove('loading');
+        button.disabled = false;
+    }
+}
 
-// ✅ NUEVO: Función para validar contraseña con todos los requisitos
-function validatePassword(password) {
-    const passwordInput = document.getElementById('registerPassword');
-    const requirementsContainer = document.getElementById('passwordRequirements');
+// ✅ FUNCIÓN PARA REGISTRO CON FETCH
+async function handleRegister(event) {
+    event.preventDefault();
     
-    // Mostrar/ocultar requisitos cuando se hace focus
-    if (password.length > 0) {
-        requirementsContainer.classList.add('show');
-    } else {
-        requirementsContainer.classList.remove('show');
+    const formData = {
+        usuario: document.getElementById('registerUser').value.trim(),
+        nombre: document.getElementById('registerName').value.trim(),
+        contraseña: document.getElementById('registerPassword').value,
+        codigoEstudiantil: document.getElementById('studentCode').value.trim(),
+        carrera: document.getElementById('career').value,
+        ubicacion: document.getElementById('city').value,
+        email: document.getElementById('email').value.trim()
+    };
+    
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const button = event.target.querySelector('.btn-primary');
+    
+    // Validaciones
+    if (!validateRegistrationForm(formData, confirmPassword)) {
+        return;
     }
     
-    // Definir requisitos
+    // Mostrar estado de carga
+    button.classList.add('loading');
+    button.disabled = true;
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/users/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        if (response.ok) {
+            const userData = await response.json();
+            
+            showMessage('¡Registro exitoso! Se ha enviado un email de confirmación.', 'success');
+            
+            // Limpiar formulario
+            document.getElementById('registerForm').querySelector('form').reset();
+            
+            // Cambiar a formulario de login después de 2 segundos
+            setTimeout(() => {
+                toggleForm();
+                showMessage('Ahora puedes iniciar sesión con tu usuario y contraseña', 'info');
+            }, 2000);
+            
+        } else {
+            const errorData = await response.text();
+            let errorMessage = 'Error al registrar usuario';
+            
+            if (response.status === 400) {
+                if (errorData.includes('usuario ya existe')) {
+                    errorMessage = 'El nombre de usuario ya está en uso';
+                } else if (errorData.includes('email ya está registrado')) {
+                    errorMessage = 'El email ya está registrado';
+                } else {
+                    errorMessage = errorData;
+                }
+            }
+            
+            showMessage(errorMessage, 'error');
+        }
+        
+    } catch (error) {
+        console.error('Error en registro:', error);
+        showMessage('Error de conexión. Verifica que el servidor esté ejecutándose.', 'error');
+    } finally {
+        // Remover estado de carga
+        button.classList.remove('loading');
+        button.disabled = false;
+    }
+}
+
+// ✅ VALIDACIÓN DEL FORMULARIO DE REGISTRO
+function validateRegistrationForm(formData, confirmPassword) {
+    // Verificar campos obligatorios
+    for (const [key, value] of Object.entries(formData)) {
+        if (!value || value === '') {
+            showMessage(`El campo ${getFieldDisplayName(key)} es obligatorio`, 'error');
+            return false;
+        }
+    }
+    
+    // Validar contraseña
+    if (!validatePassword(formData.contraseña)) {
+        showMessage('La contraseña no cumple con los requisitos mínimos', 'error');
+        return false;
+    }
+    
+    // Validar confirmación de contraseña
+    if (formData.contraseña !== confirmPassword) {
+        showMessage('Las contraseñas no coinciden', 'error');
+        return false;
+    }
+    
+    // Validar email
+    if (!validateEmail(formData.email)) {
+        showMessage('El email no tiene un formato válido', 'error');
+        return false;
+    }
+    
+    return true;
+}
+
+// ✅ FUNCIÓN PARA MOSTRAR MENSAJES
+function showMessage(message, type = 'info') {
+    // Remover mensaje anterior si existe
+    const existingMessage = document.querySelector('.auth-message');
+    if (existingMessage) {
+        existingMessage.remove();
+    }
+    
+    // Crear nuevo mensaje
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `auth-message ${type}`;
+    messageDiv.textContent = message;
+    
+    // Estilos del mensaje
+    messageDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 14px;
+        z-index: 9999;
+        animation: slideInRight 0.3s ease-out;
+        max-width: 400px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    `;
+    
+    // Colores según tipo
+    switch (type) {
+        case 'success':
+            messageDiv.style.background = '#10b981';
+            messageDiv.style.color = '#ffffff';
+            break;
+        case 'error':
+            messageDiv.style.background = '#ef4444';
+            messageDiv.style.color = '#ffffff';
+            break;
+        case 'info':
+            messageDiv.style.background = '#8b5cf6';
+            messageDiv.style.color = '#ffffff';
+            break;
+        default:
+            messageDiv.style.background = '#535353';
+            messageDiv.style.color = '#ffffff';
+    }
+    
+    document.body.appendChild(messageDiv);
+    
+    // Remover después de 5 segundos
+    setTimeout(() => {
+        if (messageDiv.parentNode) {
+            messageDiv.style.animation = 'slideOutRight 0.3s ease-out';
+            setTimeout(() => messageDiv.remove(), 300);
+        }
+    }, 5000);
+}
+
+// ✅ VALIDACIÓN DE PASSWORD CON REQUISITOS
+function validatePassword(password) {
     const requirements = {
         length: password.length >= 8,
         uppercase: /[A-Z]/.test(password),
@@ -109,21 +265,66 @@ function validatePassword(password) {
         special: /[@$!%*?&]/.test(password)
     };
     
-    // Actualizar cada requisito visualmente
+    return Object.values(requirements).every(req => req);
+}
+
+// ✅ VALIDACIÓN DE EMAIL
+function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+// ✅ OBTENER NOMBRE AMIGABLE DEL CAMPO
+function getFieldDisplayName(fieldName) {
+    const fieldNames = {
+        usuario: 'Usuario',
+        nombre: 'Nombre',
+        contraseña: 'Contraseña',
+        codigoEstudiantil: 'Código estudiantil',
+        carrera: 'Carrera',
+        ubicacion: 'Ciudad',
+        email: 'Email'
+    };
+    return fieldNames[fieldName] || fieldName;
+}
+
+// ✅ ACTUALIZAR VALIDACIÓN VISUAL DE CONTRASEÑA EN TIEMPO REAL
+function updatePasswordValidation(password) {
+    const passwordInput = document.getElementById('registerPassword');
+    const requirementsContainer = document.getElementById('passwordRequirements');
+    
+    // Mostrar/ocultar requisitos
+    if (password.length > 0) {
+        requirementsContainer.classList.add('show');
+    } else {
+        requirementsContainer.classList.remove('show');
+    }
+    
+    // Validar cada requisito
+    const requirements = {
+        length: password.length >= 8,
+        uppercase: /[A-Z]/.test(password),
+        lowercase: /[a-z]/.test(password),
+        number: /\d/.test(password),
+        special: /[@$!%*?&]/.test(password)
+    };
+    
+    // Actualizar UI de cada requisito
     Object.keys(requirements).forEach(req => {
         const element = document.getElementById(`req-${req}`);
-        if (requirements[req]) {
-            element.classList.remove('invalid');
-            element.classList.add('valid');
-        } else {
-            element.classList.remove('valid');
-            element.classList.add('invalid');
+        if (element) {
+            if (requirements[req]) {
+                element.classList.remove('invalid');
+                element.classList.add('valid');
+            } else {
+                element.classList.remove('valid');
+                element.classList.add('invalid');
+            }
         }
     });
     
-    // Verificar si todos los requisitos se cumplen
+    // Actualizar estado del input
     const allValid = Object.values(requirements).every(req => req);
-    
     if (allValid) {
         passwordInput.parentElement.classList.remove('error');
         passwordInput.parentElement.classList.add('success');
@@ -137,13 +338,12 @@ function validatePassword(password) {
     return allValid;
 }
 
-// ✅ ACTUALIZADO: Función para validar confirmación de contraseña
+// ✅ VALIDAR CONFIRMACIÓN DE CONTRASEÑA
 function validatePasswordMatch() {
     const password = document.getElementById('registerPassword').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
     const confirmInput = document.getElementById('confirmPassword');
     
-    // Solo validar si hay contenido en ambos campos
     if (password.length > 0 && confirmPassword.length > 0) {
         if (password === confirmPassword) {
             confirmInput.parentElement.classList.remove('error');
@@ -160,32 +360,63 @@ function validatePasswordMatch() {
     }
 }
 
-// Event listeners para validación visual en tiempo real
+// ✅ VERIFICAR SI YA ESTÁ LOGUEADO
+function checkIfLoggedIn() {
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    const currentUser = localStorage.getItem('currentUser');
+    
+    if (isLoggedIn === 'true' && currentUser) {
+        // Ya está logueado, redirigir al dashboard
+        window.location.href = 'dashboard.html';
+    }
+}
+
+// ✅ INICIALIZACIÓN CUANDO CARGA LA PÁGINA
 document.addEventListener('DOMContentLoaded', function() {
+    // Verificar si ya está logueado
+    checkIfLoggedIn();
+    
+    // Detectar parámetros URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get('action');
+    
+    if (action === 'register') {
+        toggleForm();
+    }
+    
+    // ✅ AGREGAR EVENT LISTENERS A LOS FORMULARIOS
+    const loginForm = document.querySelector('#loginForm form');
+    const registerForm = document.querySelector('#registerForm form');
+    
+    if (loginForm) {
+        loginForm.addEventListener('submit', handleLogin);
+    }
+    
+    if (registerForm) {
+        registerForm.addEventListener('submit', handleRegister);
+    }
+    
+    // ✅ VALIDACIÓN EN TIEMPO REAL DE CONTRASEÑA
     const registerPassword = document.getElementById('registerPassword');
     const confirmPassword = document.getElementById('confirmPassword');
-    const requirementsContainer = document.getElementById('passwordRequirements');
     
     if (registerPassword) {
-        // Mostrar requisitos al hacer focus
-        registerPassword.addEventListener('focus', function() {
-            if (this.value.length > 0) {
-                requirementsContainer.classList.add('show');
-            }
-        });
-        
-        // Ocultar requisitos al hacer blur si está vacío
-        registerPassword.addEventListener('blur', function() {
-            if (this.value.length === 0) {
-                requirementsContainer.classList.remove('show');
-            }
-        });
-        
-        // Validar en tiempo real mientras escribe
         registerPassword.addEventListener('input', function() {
-            validatePassword(this.value);
+            updatePasswordValidation(this.value);
             if (confirmPassword.value) {
                 validatePasswordMatch();
+            }
+        });
+        
+        registerPassword.addEventListener('focus', function() {
+            if (this.value.length > 0) {
+                document.getElementById('passwordRequirements').classList.add('show');
+            }
+        });
+        
+        registerPassword.addEventListener('blur', function() {
+            if (this.value.length === 0) {
+                document.getElementById('passwordRequirements').classList.remove('show');
             }
         });
     }
@@ -193,10 +424,33 @@ document.addEventListener('DOMContentLoaded', function() {
     if (confirmPassword) {
         confirmPassword.addEventListener('input', validatePasswordMatch);
     }
-});
-
-// Función para manejar los combos de carreras y ciudades
-document.addEventListener('DOMContentLoaded', function() {
+    
+    // ✅ EFECTOS VISUALES PARA INPUTS
+    const inputs = document.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+        
+        input.addEventListener('blur', function() {
+            this.parentElement.classList.remove('focused');
+            if (this.value.trim() !== '') {
+                this.parentElement.classList.add('filled');
+            } else {
+                this.parentElement.classList.remove('filled');
+            }
+        });
+        
+        input.addEventListener('input', function() {
+            if (this.value.trim() !== '') {
+                this.parentElement.classList.add('filled');
+            } else {
+                this.parentElement.classList.remove('filled');
+            }
+        });
+    });
+    
+    // ✅ VALIDACIÓN VISUAL PARA SELECTS
     const careerSelect = document.getElementById('career');
     const citySelect = document.getElementById('city');
     
@@ -211,7 +465,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     if (citySelect) {
-        // Ciudad ya viene preseleccionada, agregar clase success
+        // Ciudad ya viene preseleccionada
         if (citySelect.value !== '') {
             citySelect.parentElement.classList.add('success');
         }
@@ -224,52 +478,67 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-});
-
-// Efectos adicionales para mejorar UX
-document.addEventListener('DOMContentLoaded', function() {
-    // Efecto de ripple en botones
-    const buttons = document.querySelectorAll('.btn-primary');
     
-    buttons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            const ripple = document.createElement('span');
-            const rect = this.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height);
-            const x = e.clientX - rect.left - size / 2;
-            const y = e.clientY - rect.top - size / 2;
-            
-            ripple.style.cssText = `
-                position: absolute;
-                width: ${size}px;
-                height: ${size}px;
-                left: ${x}px;
-                top: ${y}px;
-                background: rgba(255, 255, 255, 0.3);
-                border-radius: 50%;
-                transform: scale(0);
-                animation: ripple 0.6s linear;
-                pointer-events: none;
-            `;
-            
-            this.style.position = 'relative';
-            this.style.overflow = 'hidden';
-            this.appendChild(ripple);
-            
-            setTimeout(() => {
-                ripple.remove();
-            }, 600);
-        });
-    });
+    // ✅ ANIMACIÓN DE ENTRADA
+    const authCard = document.querySelector('.auth-card');
+    authCard.style.opacity = '0';
+    authCard.style.transform = 'translateY(20px)';
     
-    // Añadir animación CSS para ripple
+    setTimeout(() => {
+        authCard.style.transition = 'all 0.6s ease';
+        authCard.style.opacity = '1';
+        authCard.style.transform = 'translateY(0)';
+    }, 100);
+    
+    // ✅ AGREGAR ESTILOS CSS PARA ANIMACIONES
     const style = document.createElement('style');
     style.textContent = `
-        @keyframes ripple {
-            to {
-                transform: scale(4);
+        @keyframes slideInRight {
+            from {
                 opacity: 0;
+                transform: translateX(100%);
             }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slideOutRight {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+        
+        .btn-primary.loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+            position: relative;
+        }
+        
+        .btn-primary.loading::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            margin: auto;
+            border: 2px solid transparent;
+            border-top-color: var(--spotify-white);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
         
         .input-group.focused label {
@@ -282,3 +551,23 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     document.head.appendChild(style);
 });
+
+// ✅ FUNCIÓN PARA DEBUGGING (puedes remover en producción)
+function debugAPI() {
+    console.log('🔍 Debugging DistriMusic API');
+    console.log('API Base URL:', API_BASE_URL);
+    console.log('Verificando conexión...');
+    
+    fetch(`${API_BASE_URL}/users`)
+        .then(response => {
+            console.log('✅ Conexión exitosa con el backend');
+            console.log('Status:', response.status);
+        })
+        .catch(error => {
+            console.log('❌ Error de conexión:', error);
+            console.log('Verifica que Spring Boot esté ejecutándose en puerto 8090');
+        });
+}
+
+// Ejecutar debug al cargar (comentar en producción)
+// debugAPI();
