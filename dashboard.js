@@ -1,4 +1,4 @@
-// DistriMusic - Dashboard JavaScript FUNCIONAL CORREGIDO
+// DistriMusic - Dashboard JavaScript FUNCIONAL
 
 // URL base de la API
 const API_BASE_URL = 'http://localhost:8090/api';
@@ -13,9 +13,6 @@ function checkAuthentication() {
     const isLoggedIn = localStorage.getItem('isLoggedIn');
     const userData = localStorage.getItem('currentUser');
     
-    console.log('isLoggedIn:', isLoggedIn);
-    console.log('userData existe:', !!userData);
-    
     if (!isLoggedIn || isLoggedIn !== 'true' || !userData) {
         console.log('❌ No hay sesión activa, redirigiendo al login');
         window.location.href = 'auth.html';
@@ -24,8 +21,7 @@ function checkAuthentication() {
     
     try {
         currentUser = JSON.parse(userData);
-        console.log('✅ Usuario cargado exitosamente:', currentUser.nombre);
-        console.log('👤 Usuario completo:', currentUser);
+        console.log('✅ Usuario cargado:', currentUser.nombre);
         return true;
     } catch (error) {
         console.error('❌ Error parsing user data:', error);
@@ -36,28 +32,17 @@ function checkAuthentication() {
 
 // ✅ FUNCIÓN PARA CARGAR INFO DEL USUARIO
 function loadUserInfo() {
-    if (!currentUser) {
-        console.log('❌ No hay currentUser disponible');
-        return;
-    }
-    
-    console.log('✅ Cargando info del usuario:', currentUser.nombre);
+    if (!currentUser) return;
     
     const userName = document.getElementById('userName');
     const userCareer = document.getElementById('userCareer');
     
     if (userName) {
         userName.textContent = currentUser.nombre;
-        console.log('✅ Nombre cargado:', currentUser.nombre);
-    } else {
-        console.log('❌ Elemento userName no encontrado');
     }
     
     if (userCareer) {
         userCareer.textContent = currentUser.carrera;
-        console.log('✅ Carrera cargada:', currentUser.carrera);
-    } else {
-        console.log('❌ Elemento userCareer no encontrado');
     }
 }
 
@@ -65,18 +50,12 @@ function loadUserInfo() {
 function logout() {
     console.log('🔄 Ejecutando logout...');
     
-    // Limpiar localStorage
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('currentUser');
     
-    console.log('✅ localStorage limpiado');
-    
-    // Mostrar mensaje
     showMessage('Sesión cerrada exitosamente', 'success');
     
-    // Redirigir después de un momento
     setTimeout(() => {
-        console.log('🔄 Redirigiendo a auth.html...');
         window.location.href = 'auth.html';
     }, 1000);
 }
@@ -85,15 +64,12 @@ function logout() {
 async function loadUserStats() {
     if (!currentUser) return;
     
-    console.log('📊 Cargando estadísticas del usuario...');
-    
     try {
         // Cargar seguidores
         const seguidoresResponse = await fetch(`${API_BASE_URL}/users/${currentUser.usuario}/followers`);
         if (seguidoresResponse.ok) {
             const seguidores = await seguidoresResponse.json();
             document.getElementById('statSeguidores').textContent = seguidores.length;
-            console.log('✅ Seguidores cargados:', seguidores.length);
         }
         
         // Cargar siguiendo
@@ -101,7 +77,6 @@ async function loadUserStats() {
         if (siguiendoResponse.ok) {
             const siguiendo = await siguiendoResponse.json();
             document.getElementById('statSiguiendo').textContent = siguiendo.length;
-            console.log('✅ Siguiendo cargados:', siguiendo.length);
         }
         
     } catch (error) {
@@ -116,21 +91,17 @@ async function loadMyPlaylists() {
     const container = document.getElementById('misPlaylists');
     if (!container) return;
     
-    console.log('🎵 Cargando mis playlists...');
-    
     try {
         const response = await fetch(`${API_BASE_URL}/playlists/user/${currentUser.usuario}`);
         
         if (response.ok) {
             const playlists = await response.json();
-            console.log('✅ Playlists cargadas:', playlists.length);
             renderPlaylists(playlists, container, true);
         } else {
-            console.log('❌ Error cargando playlists:', response.status);
             container.innerHTML = '<div class="empty-state"><h3>Error cargando playlists</h3></div>';
         }
     } catch (error) {
-        console.error('❌ Error loading my playlists:', error);
+        console.error('❌ Error loading playlists:', error);
         container.innerHTML = '<div class="empty-state"><h3>Error de conexión</h3></div>';
     }
 }
@@ -140,17 +111,13 @@ async function loadPublicPlaylists() {
     const container = document.getElementById('playlistsPublicas');
     if (!container) return;
     
-    console.log('🌍 Cargando playlists públicas...');
-    
     try {
         const response = await fetch(`${API_BASE_URL}/playlists/public`);
         
         if (response.ok) {
             const playlists = await response.json();
-            console.log('✅ Playlists públicas cargadas:', playlists.length);
             renderPlaylists(playlists, container, false);
         } else {
-            console.log('❌ Error cargando playlists públicas:', response.status);
             container.innerHTML = '<div class="empty-state"><h3>Error cargando playlists públicas</h3></div>';
         }
     } catch (error) {
@@ -176,10 +143,15 @@ function renderPlaylists(playlists, container, isOwner = false) {
         const createdDate = playlist.fechaCreacion ? 
             new Date(playlist.fechaCreacion).toLocaleDateString('es-ES') : 'Fecha desconocida';
         
+        // Usar imagen personalizada si existe
+        const imageContent = playlist.imageUrl ? 
+            `<img src="${playlist.imageUrl}" alt="${playlist.nombre}" style="width: 100%; height: 100%; object-fit: cover;">` :
+            '🎵';
+        
         return `
             <div class="playlist-card" data-playlist-id="${playlist.id}" onclick="viewPlaylistDetails(${playlist.id})">
                 <div class="playlist-cover">
-                    🎵
+                    ${imageContent}
                 </div>
                 <div class="playlist-info">
                     <h3>${playlist.nombre}</h3>
@@ -213,17 +185,13 @@ async function searchSongs() {
         return;
     }
     
-    console.log('🔍 Buscando canciones:', query);
-    
     try {
         const response = await fetch(`${API_BASE_URL}/music/search?query=${encodeURIComponent(query)}`);
         
         if (response.ok) {
             const songs = await response.json();
-            console.log('✅ Canciones encontradas:', songs.length);
             renderSearchResults(songs, resultsContainer);
         } else {
-            console.log('❌ Error en búsqueda:', response.status);
             resultsContainer.innerHTML = '<div class="empty-state"><h3>Error en la búsqueda</h3></div>';
         }
     } catch (error) {
@@ -276,8 +244,6 @@ async function createPlaylist(playlistData) {
             usuario: currentUser
         };
         
-        console.log('📝 Creando playlist:', requestData);
-        
         const response = await fetch(`${API_BASE_URL}/playlists`, {
             method: 'POST',
             headers: {
@@ -288,13 +254,11 @@ async function createPlaylist(playlistData) {
         
         if (response.ok) {
             const newPlaylist = await response.json();
-            console.log('✅ Playlist creada:', newPlaylist);
             showMessage('¡Playlist creada exitosamente!', 'success');
             loadMyPlaylists();
             return newPlaylist;
         } else {
             const errorData = await response.text();
-            console.log('❌ Error creando playlist:', errorData);
             showMessage(`Error al crear playlist: ${errorData}`, 'error');
             return null;
         }
@@ -310,6 +274,7 @@ function handleCreatePlaylist(event) {
     event.preventDefault();
     
     const playlistName = document.getElementById('playlistName').value.trim();
+    const playlistImage = document.getElementById('playlistImage').value.trim();
     const isPublic = document.getElementById('isPublic').checked;
     
     if (!playlistName) {
@@ -317,9 +282,16 @@ function handleCreatePlaylist(event) {
         return;
     }
     
+    // Validar URL de imagen si se proporciona
+    if (playlistImage && !isValidUrl(playlistImage)) {
+        showMessage('La URL de la imagen no es válida', 'error');
+        return;
+    }
+    
     const playlistData = {
         nombre: playlistName,
-        esPublica: isPublic
+        esPublica: isPublic,
+        imageUrl: playlistImage || null
     };
     
     createPlaylist(playlistData).then(result => {
@@ -330,10 +302,18 @@ function handleCreatePlaylist(event) {
     });
 }
 
+// ✅ FUNCIÓN PARA VALIDAR URL
+function isValidUrl(string) {
+    try {
+        new URL(string);
+        return true;
+    } catch (_) {
+        return false;
+    }
+}
+
 // ✅ FUNCIÓN PARA NAVEGACIÓN
 function showSection(sectionName) {
-    console.log('📍 Navegando a sección:', sectionName);
-    
     // Ocultar todas las secciones
     const sections = document.querySelectorAll('.content-section');
     sections.forEach(section => section.classList.remove('active'));
@@ -444,7 +424,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadUserStats();
     loadMyPlaylists();
     
-    // ✅ EVENT LISTENERS
+    // EVENT LISTENERS
     
     // Navegación
     const navLinks = document.querySelectorAll('.nav-link[data-section]');
@@ -459,14 +439,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Logout
     const btnLogout = document.getElementById('btnLogout');
     if (btnLogout) {
-        console.log('✅ Botón logout encontrado');
         btnLogout.addEventListener('click', (e) => {
             e.preventDefault();
-            console.log('🔄 Logout clickeado');
             logout();
         });
-    } else {
-        console.log('❌ Botón logout NO encontrado');
     }
     
     // Crear playlist
@@ -494,7 +470,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Cerrar modal al hacer click fuera
     if (playlistModal) {
         playlistModal.addEventListener('click', (e) => {
             if (e.target === playlistModal) {
@@ -544,37 +519,17 @@ document.addEventListener('DOMContentLoaded', function() {
         btnRefreshExplorar.addEventListener('click', loadPublicPlaylists);
     }
     
-    // Filtro de carrera
-    const filterCarrera = document.getElementById('filterCarrera');
-    if (filterCarrera) {
-        filterCarrera.addEventListener('change', () => {
-            loadPublicPlaylists();
-        });
-    }
-    
-    // ✅ AGREGAR ESTILOS CSS PARA ANIMACIONES
+    // Agregar estilos CSS
     const style = document.createElement('style');
     style.textContent = `
         @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(100%);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
         }
         
         @keyframes slideOutRight {
-            from {
-                opacity: 1;
-                transform: translateX(0);
-            }
-            to {
-                opacity: 0;
-                transform: translateX(100%);
-            }
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(100%); }
         }
         
         .empty-state {
@@ -590,61 +545,21 @@ document.addEventListener('DOMContentLoaded', function() {
             font-size: 18px;
         }
         
-        .empty-state p {
-            font-size: 14px;
-        }
-        
-        .playlist-card {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        
         .playlist-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
         }
         
-        .result-item {
-            transition: background-color 0.2s ease;
-        }
-        
         .result-item:hover {
             background: rgba(139, 92, 246, 0.1);
-        }
-        
-        .search-results {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 32px;
-        }
-        
-        .search-results h4 {
-            margin-bottom: 16px;
-            color: var(--spotify-white);
         }
     `;
     document.head.appendChild(style);
     
     console.log('✅ Dashboard inicializado correctamente');
-    console.log('👤 Usuario actual:', currentUser?.nombre);
 });
 
-// ✅ FUNCIONES GLOBALES PARA USO EN HTML
+// FUNCIONES GLOBALES
 window.viewPlaylistDetails = viewPlaylistDetails;
 window.selectSong = selectSong;
 window.showSection = showSection;
-
-// ✅ TEST DE CONEXIÓN
-console.log('🌐 Probando conexión con backend...');
-fetch(`${API_BASE_URL}/users`)
-    .then(response => {
-        if (response.ok) {
-            console.log('✅ Backend conectado correctamente');
-        } else {
-            console.log('⚠️ Backend responde pero con error:', response.status);
-        }
-    })
-    .catch(error => {
-        console.log('❌ Backend NO conectado:', error.message);
-        console.log('🔧 Verifica que Spring Boot esté corriendo en puerto 8090');
-    });

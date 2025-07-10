@@ -81,12 +81,6 @@
             <section id="section-explorar" class="content-section">
                 <h2>Explorar Playlists Públicas</h2>
                 <div class="filters">
-                    <select id="filterCarrera" class="filter-select">
-                        <option value="">Todas las carreras</option>
-                        <option value="Ingeniería de Sistemas">Ing. Sistemas</option>
-                        <option value="Ingeniería Electrónica">Ing. Electrónica</option>
-                        <option value="Ingeniería Industrial">Ing. Industrial</option>
-                    </select>
                     <button class="btn-secondary" id="btnRefreshExplorar">
                         <span class="material-icons">refresh</span>
                         Actualizar
@@ -110,6 +104,11 @@
                 <div class="form-group">
                     <label for="playlistName">Nombre de la playlist</label>
                     <input type="text" id="playlistName" required placeholder="Mi nueva playlist">
+                </div>
+                <div class="form-group">
+                    <label for="playlistImage">URL de la imagen (opcional)</label>
+                    <input type="url" id="playlistImage" placeholder="https://ejemplo.com/imagen.jpg">
+                    <small>Agrega un enlace a una imagen para personalizar tu playlist</small>
                 </div>
                 <div class="form-group">
                     <label class="checkbox-label">
