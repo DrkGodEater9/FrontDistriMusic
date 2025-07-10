@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DistriMusic - Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Circular:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <!-- Header/Navbar -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>DistriMusic</h1>
+            </div>
+            <nav class="nav">
+                <a href="#" class="nav-link active" data-section="inicio">Inicio</a>
+                <a href="#" class="nav-link" data-section="explorar">Explorar</a>
+            </nav>
+            <div class="user-menu">
+                <div class="user-info">
+                    <span class="user-name" id="userName">Cargando...</span>
+                    <span class="user-career" id="userCareer">Cargando...</span>
+                </div>
+                <div class="user-actions">
+                    <button class="btn-icon" id="btnProfile">
+                        <span class="material-icons">account_circle</span>
+                    </button>
+                    <button class="btn-secondary" id="btnLogout">Cerrar sesión</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Sección Inicio -->
+            <section id="section-inicio" class="content-section active">
+                <!-- Stats compactas arriba -->
+                <div class="stats-compact">
+                    <div class="stat-item">
+                        <span class="stat-label">Seguidores:</span>
+                        <span class="stat-value" id="statSeguidores">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Siguiendo:</span>
+                        <span class="stat-value" id="statSiguiendo">0</span>
+                    </div>
+                </div>
+
+                <!-- Mensaje de bienvenida -->
+                <div class="welcome-banner">
+                    <h2>¡Bienvenido de vuelta!</h2>
+                    <p>Descubre nueva música y conecta con la comunidad UD</p>
+                </div>
+
+                <!-- Barra de búsqueda -->
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Buscar canciones, artistas, álbumes..." class="search-input">
+                    <button class="btn-search" id="btnSearch">
+                        <span class="material-icons">search</span>
+                    </button>
+                </div>
+
+                <!-- Resultados de búsqueda (ocultos inicialmente) -->
+                <div id="searchResults" class="search-results" style="display: none;">
+                    <!-- Resultados de búsqueda -->
+                </div>
+
+                <!-- Mis Playlists -->
+                <div class="section-title">
+                    <h3>Tus playlists</h3>
+                    <button class="btn-primary" id="btnCreatePlaylist">
+                        <span class="material-icons">add</span>
+                        Nueva Playlist
+                    </button>
+                </div>
+                <div class="playlists-grid" id="misPlaylists">
+                    <!-- Se llenan dinámicamente -->
+                </div>
+            </section>
+
+            <!-- Sección Explorar -->
+            <section id="section-explorar" class="content-section">
+                <h2>Explorar Playlists Públicas</h2>
+                <div class="filters">
+                    <select id="filterCarrera" class="filter-select">
+                        <option value="">Todas las carreras</option>
+                        <option value="Ingeniería de Sistemas">Ing. Sistemas</option>
+                        <option value="Ingeniería Electrónica">Ing. Electrónica</option>
+                        <option value="Ingeniería Industrial">Ing. Industrial</option>
+                    </select>
+                    <button class="btn-secondary" id="btnRefreshExplorar">
+                        <span class="material-icons">refresh</span>
+                        Actualizar
+                    </button>
+                </div>
+                <div class="playlists-grid" id="playlistsPublicas">
+                    <!-- Se llenan dinámicamente -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modal para crear/editar playlist -->
+    <div id="playlistModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Nueva Playlist</h3>
+                <span class="close" id="closeModal">&times;</span>
+            </div>
+            <form id="playlistForm">
+                <div class="form-group">
+                    <label for="playlistName">Nombre de la playlist</label>
+                    <input type="text" id="playlistName" required placeholder="Mi nueva playlist">
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="isPublic">
+                        <span class="checkmark"></span>
+                        Playlist pública
+                    </label>
+                    <small>Las playlists públicas pueden ser vistas y comentadas por otros usuarios</small>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancelModal">Cancelar</button>
+                    <button type="submit" class="btn-primary">Crear Playlist</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para ver detalles de playlist -->
+    <div id="playlistDetailModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 id="detailPlaylistName">Nombre de Playlist</h3>
+                <span class="close" id="closeDetailModal">&times;</span>
+            </div>
+            <div class="playlist-detail-content">
+                <div class="playlist-info">
+                    <div class="playlist-meta">
+                        <span id="detailPlaylistOwner">Por: Usuario</span>
+                        <span id="detailPlaylistDate">Creada el: Fecha</span>
+                        <span id="detailPlaylistType">Tipo: Pública</span>
+                    </div>
+                    <div class="playlist-actions" id="playlistDetailActions">
+                        <!-- Botones de acción según permisos -->
+                    </div>
+                </div>
+                
+                <div class="songs-section">
+                    <h4>Canciones (<span id="songsCount">0</span>)</h4>
+                    <div class="songs-list" id="songsList">
+                        <!-- Lista de canciones -->
+                    </div>
+                </div>
+
+                <div class="comments-section" id="commentsSection">
+                    <h4>Comentarios</h4>
+                    <div class="comment-form" id="commentForm">
+                        <textarea id="commentText" placeholder="Escribe un comentario..."></textarea>
+                        <button type="button" class="btn-primary" id="btnAddComment">Comentar</button>
+                    </div>
+                    <div class="comments-list" id="commentsList">
+                        <!-- Lista de comentarios -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
