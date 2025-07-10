@@ -47,7 +47,7 @@ async function handleLogin(event) {
             },
             body: JSON.stringify({
                 usuario: usuario,
-                contraseña: contraseña
+                password: contraseña  // ✅ ARREGLADO: usar 'password'
             })
         });
         
@@ -90,14 +90,14 @@ async function handleLogin(event) {
     }
 }
 
-// ✅ FUNCIÓN PARA REGISTRO CON FETCH
+// ✅ FUNCIÓN PARA REGISTRO CON FETCH - ARREGLADA
 async function handleRegister(event) {
     event.preventDefault();
     
     const formData = {
         usuario: document.getElementById('registerUser').value.trim(),
         nombre: document.getElementById('registerName').value.trim(),
-        contraseña: document.getElementById('registerPassword').value,
+        password: document.getElementById('registerPassword').value,  // ✅ ARREGLADO: 'password'
         codigoEstudiantil: document.getElementById('studentCode').value.trim(),
         carrera: document.getElementById('career').value,
         ubicacion: document.getElementById('city').value,
@@ -166,7 +166,7 @@ async function handleRegister(event) {
     }
 }
 
-// ✅ VALIDACIÓN DEL FORMULARIO DE REGISTRO
+// ✅ VALIDACIÓN DEL FORMULARIO DE REGISTRO - ARREGLADA
 function validateRegistrationForm(formData, confirmPassword) {
     // Verificar campos obligatorios
     for (const [key, value] of Object.entries(formData)) {
@@ -177,13 +177,13 @@ function validateRegistrationForm(formData, confirmPassword) {
     }
     
     // Validar contraseña
-    if (!validatePassword(formData.contraseña)) {
+    if (!validatePassword(formData.password)) {  // ✅ ARREGLADO: 'password'
         showMessage('La contraseña no cumple con los requisitos mínimos', 'error');
         return false;
     }
     
     // Validar confirmación de contraseña
-    if (formData.contraseña !== confirmPassword) {
+    if (formData.password !== confirmPassword) {  // ✅ ARREGLADO: 'password'
         showMessage('Las contraseñas no coinciden', 'error');
         return false;
     }
@@ -279,7 +279,7 @@ function getFieldDisplayName(fieldName) {
     const fieldNames = {
         usuario: 'Usuario',
         nombre: 'Nombre',
-        contraseña: 'Contraseña',
+        password: 'Contraseña',  // ✅ ARREGLADO: 'password'
         codigoEstudiantil: 'Código estudiantil',
         carrera: 'Carrera',
         ubicacion: 'Ciudad',
@@ -551,23 +551,3 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     document.head.appendChild(style);
 });
-
-// ✅ FUNCIÓN PARA DEBUGGING (puedes remover en producción)
-function debugAPI() {
-    console.log('🔍 Debugging DistriMusic API');
-    console.log('API Base URL:', API_BASE_URL);
-    console.log('Verificando conexión...');
-    
-    fetch(`${API_BASE_URL}/users`)
-        .then(response => {
-            console.log('✅ Conexión exitosa con el backend');
-            console.log('Status:', response.status);
-        })
-        .catch(error => {
-            console.log('❌ Error de conexión:', error);
-            console.log('Verifica que Spring Boot esté ejecutándose en puerto 8090');
-        });
-}
-
-// Ejecutar debug al cargar (comentar en producción)
-// debugAPI();
