@@ -12,6 +12,7 @@
     --error-color: #ef4444;
     --success-color: #10b981;
     --warning-color: #f59e0b;
+    --danger-color: #dc2626;
 }
 
 /* Reset y estilos base */
@@ -138,7 +139,7 @@ body {
 }
 
 /* Botones */
-.btn-primary, .btn-secondary, .btn-text {
+.btn-primary, .btn-secondary, .btn-text, .btn-danger {
     padding: 12px 24px;
     border-radius: 24px;
     font-weight: 600;
@@ -173,6 +174,31 @@ body {
 .btn-secondary:hover {
     background: rgba(255, 255, 255, 0.2);
     border-color: var(--spotify-purple);
+}
+
+/* ✅ NUEVO - Botón de peligro para eliminar */
+.btn-danger {
+    background: linear-gradient(135deg, var(--error-color) 0%, var(--danger-color) 100%);
+    color: var(--spotify-white);
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, var(--danger-color) 0%, #b91c1c 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+}
+
+.btn-danger:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+/* Botones pequeños */
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 12px;
+    border-radius: 16px;
 }
 
 /* Main Content */
@@ -466,6 +492,60 @@ body {
     border: 1px solid rgba(107, 114, 128, 0.3);
 }
 
+/* ✅ NUEVO - Botones de acción en playlist cards */
+.playlist-actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 5;
+}
+
+.playlist-card:hover .playlist-actions {
+    opacity: 1;
+}
+
+.playlist-action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    font-size: 16px;
+}
+
+.playlist-action-btn.delete {
+    background: rgba(239, 68, 68, 0.9);
+    color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.playlist-action-btn.delete:hover {
+    background: rgba(220, 38, 38, 1);
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
+}
+
+.playlist-action-btn.edit {
+    background: rgba(139, 92, 246, 0.9);
+    color: white;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+.playlist-action-btn.edit:hover {
+    background: rgba(124, 58, 237, 1);
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+}
+
 /* Filters Section */
 .filters {
     display: flex;
@@ -595,6 +675,49 @@ body {
     flex: 1;
     overflow-y: auto;
     min-height: 0;
+}
+
+/* ✅ MODAL DE CONFIRMACIÓN DE ELIMINACIÓN */
+.confirmation-modal {
+    text-align: center;
+}
+
+.confirmation-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+    opacity: 0.8;
+}
+
+.confirmation-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--spotify-white);
+    margin-bottom: 12px;
+}
+
+.confirmation-message {
+    font-size: 16px;
+    color: var(--spotify-light-gray);
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+.confirmation-warning {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 16px 0;
+    color: var(--error-color);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.confirmation-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 24px;
 }
 
 /* ✅ ESTRUCTURA ORGANIZADA DEL MODAL DE PLAYLIST */
@@ -1227,6 +1350,37 @@ body {
     border-radius: 2px;
 }
 
+/* ✅ NUEVA SECCIÓN PELIGROSA PARA ELIMINACIÓN DE CUENTA */
+.form-section.danger {
+    background: rgba(239, 68, 68, 0.05);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.form-section.danger h4 {
+    color: var(--error-color);
+}
+
+.form-section.danger h4::before {
+    background: linear-gradient(135deg, var(--error-color) 0%, var(--danger-color) 100%);
+}
+
+.danger-warning {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+    color: var(--error-color);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.danger-warning strong {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -1644,6 +1798,10 @@ body {
     .stats-compact {
         gap: 20px;
     }
+    
+    .playlist-actions {
+        opacity: 1; /* Siempre visible en pantallas táctiles */
+    }
 }
 
 @media (max-width: 768px) {
@@ -1736,6 +1894,19 @@ body {
         font-size: 36px;
     }
     
+    .playlist-actions {
+        opacity: 1; /* Siempre visible en móvil */
+        top: 8px;
+        right: 8px;
+        gap: 6px;
+    }
+    
+    .playlist-action-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+    }
+    
     .stats-compact {
         flex-direction: column;
         gap: 16px;
@@ -1818,7 +1989,19 @@ body {
     }
     
     .modal-actions .btn-primary,
-    .modal-actions .btn-secondary {
+    .modal-actions .btn-secondary,
+    .modal-actions .btn-danger {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .confirmation-actions {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .confirmation-actions .btn-danger,
+    .confirmation-actions .btn-secondary {
         width: 100%;
         justify-content: center;
     }
@@ -1858,6 +2041,12 @@ body {
     .btn-add-song, .btn-remove-song {
         width: 28px;
         height: 28px;
+        font-size: 12px;
+    }
+    
+    .playlist-action-btn {
+        width: 24px;
+        height: 24px;
         font-size: 12px;
     }
     
@@ -1923,7 +2112,25 @@ body {
     .comment-submit {
         width: 100%;
     }
-    /* ✅ ESTILOS MEJORADOS PARA COMENTARIOS */
+    
+    .confirmation-modal {
+        padding: 16px;
+    }
+    
+    .confirmation-icon {
+        font-size: 48px;
+    }
+    
+    .confirmation-title {
+        font-size: 20px;
+    }
+    
+    .confirmation-message {
+        font-size: 14px;
+    }
+}
+
+/* ✅ ESTILOS MEJORADOS PARA COMENTARIOS */
 #commentsSection {
     border-top: 2px solid rgba(139, 92, 246, 0.3);
     padding: 24px;
@@ -2126,58 +2333,6 @@ body {
     animation: spin 1s linear infinite;
 }
 
-/* ✅ RESPONSIVE PARA COMENTARIOS */
-@media (max-width: 768px) {
-    #commentsSection {
-        padding: 16px;
-        margin-top: 16px;
-    }
-    
-    .comments-title {
-        font-size: 18px;
-        margin-bottom: 16px;
-    }
-    
-    .comment-item {
-        padding: 12px;
-        margin-bottom: 16px;
-    }
-    
-    .comment-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-    }
-    
-    #commentForm {
-        flex-direction: column;
-        gap: 12px;
-        padding: 12px;
-    }
-    
-    #commentForm button[type="submit"] {
-        width: 100%;
-        justify-content: center;
-    }
-}
-
-@media (max-width: 480px) {
-    .comment-content {
-        font-size: 14px;
-    }
-    
-    .comment-user {
-        font-size: 13px;
-    }
-    
-    .comment-date {
-        font-size: 11px;
-    }
-    
-    .btn-delete-comment .material-icons {
-        font-size: 16px;
-    }
-}
 /* ✅ LISTA DE COMENTARIOS CON SCROLL */
 #commentsList {
     max-height: 400px;
@@ -2227,21 +2382,64 @@ body {
     bottom: 0;
     backdrop-filter: blur(10px);
 }
-
-/* ✅ RESPONSIVE MEJORADO */
-@media (max-width: 768px) {
-    #commentsList {
-        max-height: 300px;
-    }
-    
-    #commentForm {
-        position: static;
-    }
+.btn-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    font-family: inherit;
 }
 
-@media (max-width: 480px) {
-    #commentsList {
-        max-height: 250px;
-    }
+.btn-danger:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
+
+.btn-danger:active {
+    transform: translateY(0);
+}
+
+.btn-danger:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.delete-warning {
+    text-align: center;
+    padding: 24px;
+}
+
+.delete-warning h4 {
+    color: #ef4444;
+    margin: 16px 0 8px 0;
+    font-size: 20px;
+}
+
+.delete-warning p {
+    margin: 8px 0;
+    color: #6b7280;
+}
+
+.profile-danger-zone {
+    margin-top: 32px;
+    padding: 20px;
+    border: 2px dashed #ef4444;
+    border-radius: 8px;
+    background: rgba(239, 68, 68, 0.1);
+    animation: pulse-warning 2s infinite;
+}
+
+@keyframes pulse-warning {
+    0%, 100% { border-color: #ef4444; }
+    50% { border-color: #f87171; }
 }

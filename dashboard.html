@@ -9,8 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Circular:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!-- Agregar esta línea en el <head> del dashboard.html -->
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
+    <!-- Favicon dinámico -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
 </head>
 
 <body>
@@ -30,7 +30,7 @@
                     <span class="user-career" id="userCareer">Cargando...</span>
                 </div>
                 <div class="user-actions">
-                    <button class="btn-icon" id="btnProfile">
+                    <button class="btn-icon" id="btnProfile" title="Editar perfil">
                         <span class="material-icons">account_circle</span>
                     </button>
                     <button class="btn-secondary" id="btnLogout">Cerrar sesión</button>
@@ -108,29 +108,142 @@
                 <h3 id="modalTitle">Nueva Playlist</h3>
                 <span class="close" id="closeModal">&times;</span>
             </div>
-            <form id="playlistForm">
-                <div class="form-group">
-                    <label for="playlistName">Nombre de la playlist</label>
-                    <input type="text" id="playlistName" required placeholder="Mi nueva playlist">
+            <div class="modal-body">
+                <form id="playlistForm">
+                    <div class="form-group">
+                        <label for="playlistName">Nombre de la playlist</label>
+                        <input type="text" id="playlistName" required placeholder="Mi nueva playlist">
+                    </div>
+                    <div class="form-group">
+                        <label for="playlistImage">URL de la imagen (opcional)</label>
+                        <input type="url" id="playlistImage" placeholder="https://ejemplo.com/imagen.jpg">
+                        <small>Agrega un enlace a una imagen para personalizar tu playlist</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="isPublic">
+                            <span class="checkmark"></span>
+                            Playlist pública
+                        </label>
+                        <small>Las playlists públicas pueden ser vistas y comentadas por otros usuarios</small>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" id="cancelModal">Cancelar</button>
+                        <button type="submit" class="btn-primary">
+                            <span class="material-icons">save</span>
+                            Crear Playlist
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ NUEVO - Modal para editar playlist -->
+    <div id="editPlaylistModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Editar Playlist</h3>
+                <span class="close" id="closeEditModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="editPlaylistForm">
+                    <div class="form-group">
+                        <label for="editPlaylistName">Nombre de la playlist</label>
+                        <input type="text" id="editPlaylistName" required placeholder="Nombre de la playlist">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPlaylistImage">URL de la imagen (opcional)</label>
+                        <input type="url" id="editPlaylistImage" placeholder="https://ejemplo.com/imagen.jpg">
+                        <small>Agrega un enlace a una imagen para personalizar tu playlist</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="editIsPublic">
+                            <span class="checkmark"></span>
+                            Playlist pública
+                        </label>
+                        <small>Las playlists públicas pueden ser vistas y comentadas por otros usuarios</small>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" id="cancelEditModal">Cancelar</button>
+                        <button type="submit" class="btn-primary">
+                            <span class="material-icons">save</span>
+                            Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ NUEVO - Modal de confirmación para eliminar playlist -->
+    <div id="confirmDeletePlaylistModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirmar Eliminación</h3>
+                <span class="close" id="closeConfirmDeleteModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="confirmation-modal">
+                    <div class="confirmation-icon">🗑️</div>
+                    <h4 class="confirmation-title">¿Eliminar playlist?</h4>
+                    <p class="confirmation-message">
+                        Estás a punto de eliminar la playlist "<span id="playlistToDeleteName"></span>".
+                    </p>
+                    <div class="confirmation-warning">
+                        <strong>⚠️ Advertencia:</strong>
+                        Esta acción no se puede deshacer. Se eliminarán todas las canciones de la playlist y todos los comentarios asociados.
+                    </div>
+                    <div class="confirmation-actions">
+                        <button type="button" class="btn-secondary" id="cancelDeletePlaylist">Cancelar</button>
+                        <button type="button" class="btn-danger" id="confirmDeletePlaylist">
+                            <span class="material-icons">delete_forever</span>
+                            Eliminar Definitivamente
+                        </button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="playlistImage">URL de la imagen (opcional)</label>
-                    <input type="url" id="playlistImage" placeholder="https://ejemplo.com/imagen.jpg">
-                    <small>Agrega un enlace a una imagen para personalizar tu playlist</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ NUEVO - Modal de confirmación para eliminar cuenta -->
+    <div id="confirmDeleteAccountModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>⚠️ Eliminar Cuenta</h3>
+                <span class="close" id="closeConfirmDeleteAccountModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="confirmation-modal">
+                    <div class="confirmation-icon">👤</div>
+                    <h4 class="confirmation-title">¿Eliminar tu cuenta permanentemente?</h4>
+                    <p class="confirmation-message">
+                        Estás a punto de eliminar tu cuenta de DistriMusic de forma <strong>permanente</strong>.
+                    </p>
+                    <div class="confirmation-warning">
+                        <strong>🚨 PELIGRO - Esta acción es irreversible:</strong>
+                        <ul style="margin: 8px 0 0 20px; text-align: left;">
+                            <li>Se eliminarán todas tus playlists</li>
+                            <li>Se perderán todos tus comentarios</li>
+                            <li>Se eliminarán todas tus conexiones sociales</li>
+                            <li>No podrás recuperar tu cuenta ni tus datos</li>
+                        </ul>
+                    </div>
+                    <div class="form-group" style="margin: 20px 0;">
+                        <label for="confirmDeletePassword">Confirma tu contraseña para continuar:</label>
+                        <input type="password" id="confirmDeletePassword" placeholder="Tu contraseña actual" required>
+                        <small>Necesitamos verificar tu identidad antes de eliminar la cuenta</small>
+                    </div>
+                    <div class="confirmation-actions">
+                        <button type="button" class="btn-secondary" id="cancelDeleteAccount">Cancelar</button>
+                        <button type="button" class="btn-danger" id="confirmDeleteAccount">
+                            <span class="material-icons">delete_forever</span>
+                            Eliminar Cuenta Permanentemente
+                        </button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="isPublic">
-                        <span class="checkmark"></span>
-                        Playlist pública
-                    </label>
-                    <small>Las playlists públicas pueden ser vistas y comentadas por otros usuarios</small>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-secondary" id="cancelModal">Cancelar</button>
-                    <button type="submit" class="btn-primary">Crear Playlist</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 
@@ -141,30 +254,39 @@
                 <h3 id="detailPlaylistName">Nombre de Playlist</h3>
                 <span class="close" id="closeDetailModal">&times;</span>
             </div>
-            <div class="playlist-detail-content">
-                <div class="playlist-info">
-                    <div class="playlist-meta">
-                        <span id="detailPlaylistOwner">Por: Usuario</span>
-                        <span id="detailPlaylistDate">Creada el: Fecha</span>
-                        <span id="detailPlaylistType">Tipo: Pública</span>
+            <div class="modal-body">
+                <div class="playlist-detail-content">
+                    <div class="playlist-info">
+                        <div class="playlist-meta">
+                            <span id="detailPlaylistOwner">Por: Usuario</span>
+                            <span id="detailPlaylistDate">Creada el: Fecha</span>
+                            <span id="detailPlaylistType">Tipo: Pública</span>
+                        </div>
                     </div>
-                </div>
-                <!-- Las canciones se cargan dinámicamente aquí -->
-                <!-- Sección de comentarios, solo para playlists públicas -->
-                <div id="commentsSection" style="display:none; margin-top:32px;">
-                    <h4>Comentarios</h4>
-                    <div id="commentsList">
-                        <!-- Comentarios cargados dinámicamente -->
+                    <!-- Las canciones se cargan dinámicamente aquí -->
+                    <!-- Sección de comentarios, solo para playlists públicas -->
+                    <div id="commentsSection" style="display:none; margin-top:32px;">
+                        <h4 class="comments-title">
+                            <span class="material-icons">comment</span>
+                            Comentarios
+                        </h4>
+                        <div id="commentsList">
+                            <!-- Comentarios cargados dinámicamente -->
+                        </div>
+                        <form id="commentForm" style="margin-top:16px; display:flex; gap:8px;">
+                            <input type="text" id="commentInput" maxlength="500" placeholder="Escribe un comentario..." class="comment-input" style="flex:1;">
+                            <button type="submit" class="btn-primary">
+                                <span class="material-icons">send</span>
+                                Comentar
+                            </button>
+                        </form>
                     </div>
-                    <form id="commentForm" style="margin-top:16px; display:flex; gap:8px;">
-                        <input type="text" id="commentInput" maxlength="500" placeholder="Escribe un comentario..." class="input" style="flex:1;">
-                        <button type="submit" class="btn-primary">Comentar</button>
-                    </form>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Modal para editar perfil - Agregar al dashboard.html antes del cierre del body -->
+
+    <!-- Modal para editar perfil -->
     <div id="profileModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -220,8 +342,7 @@
                         <div class="form-group">
                             <label for="newPassword">Nueva contraseña</label>
                             <input type="password" id="newPassword" placeholder="Nueva contraseña">
-                            <small>Mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter
-                                especial</small>
+                            <small>Mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial</small>
                         </div>
                         <div class="form-group">
                             <label for="confirmPassword">Confirmar nueva contraseña</label>
@@ -250,6 +371,27 @@
                                 <span class="stat-label">Miembro desde</span>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- ✅ NUEVA SECCIÓN PELIGROSA - Eliminación de Cuenta -->
+                    <div class="form-section danger">
+                        <h4>⚠️ Zona Peligrosa</h4>
+                        <div class="danger-warning">
+                            <strong>ELIMINAR CUENTA PERMANENTEMENTE</strong>
+                            Una vez que elimines tu cuenta, no hay vuelta atrás. Por favor, asegúrate de que realmente quieres hacer esto.
+                            <br><br>
+                            <strong>Esto eliminará:</strong>
+                            <ul style="margin: 8px 0 0 20px;">
+                                <li>Todas tus playlists</li>
+                                <li>Todos tus comentarios</li>
+                                <li>Todas tus conexiones sociales</li>
+                                <li>Todo tu historial en DistriMusic</li>
+                            </ul>
+                        </div>
+                        <button type="button" class="btn-danger" id="btnDeleteAccount">
+                            <span class="material-icons">delete_forever</span>
+                            Eliminar Mi Cuenta Permanentemente
+                        </button>
                     </div>
 
                     <div class="modal-actions">

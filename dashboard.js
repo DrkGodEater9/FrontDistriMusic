@@ -7,6 +7,7 @@ const API_BASE_URL = 'http://localhost:8090/api';
 let currentUser = null;
 let selectedPlaylistForSongs = null;
 let currentPlaylistSongs = []; // Array para mantener las canciones actuales de la playlist
+let editingPlaylistId = null;
 
 // ✅ FUNCIÓN PARA VERIFICAR AUTENTICACIÓN
 function checkAuthentication() {
@@ -602,6 +603,96 @@ function filterSongs() {
         }
     });
 }
+async function updatePlaylistDetailModalIfOpen(playlistId) {
+    const detailModal = document.getElementById('playlistDetailModal');
+    
+    // Solo actualizar si el modal está abierto
+    if (detailModal && detailModal.style.display === 'block') {
+        try {
+            // Obtener datos actualizados
+            const playlistResponse = await fetch(`${API_BASE_URL}/playlists/${playlistId}`);
+            const songsResponse = await fetch(`${API_BASE_URL}/playlists/${playlistId}/songs`);
+            
+            if (playlistResponse.ok && songsResponse.ok) {
+                const playlist = await playlistResponse.json();
+                const songs = await songsResponse.json();
+                
+                // Actualizar las canciones globales
+                currentPlaylistSongs = songs;
+                
+                // Actualizar solo la sección de canciones en el modal
+                updateSongsInDetailModal(playlist, songs);
+            }
+        } catch (error) {
+            console.error('Error actualizando modal de detalles:', error);
+        }
+    }
+}
+
+function updateSongsInDetailModal(playlist, songs) {
+    const songsSection = document.querySelector('.playlist-songs');
+    
+    if (songsSection) {
+        let songsHTML = songs.length > 0 ? `
+            <h4>Canciones (${songs.length})</h4>
+            <div class="songs-list">
+                ${songs.map(song => `
+                    <div class="song-item" data-song-id="${song.id}">
+                        <div class="song-cover">
+                            ${song.imageUrl ?
+                                `<img src="${song.imageUrl}" alt="${song.titulo}" style="width: 50px; height: 50px; border-radius: 6px; object-fit: cover;">` :
+                                '<div style="width: 50px; height: 50px; background: linear-gradient(135deg, var(--spotify-purple), var(--distrital-gold)); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">🎵</div>'
+                            }
+                        </div>
+                        <div class="song-info">
+                            <h5>${song.titulo}</h5>
+                            <p>${song.artista} - ${song.album}</p>
+                        </div>
+                        ${currentUser && playlist.usuario?.usuario === currentUser.usuario ?
+                            `<button class="btn-remove-song" onclick="removeSongFromPlaylist(${playlist.id}, ${song.id})">
+                                <span class="material-icons">remove</span>
+                            </button>` : ''
+                        }
+                    </div>
+                `).join('')}
+            </div>
+        ` : '<div class="empty-songs-content"><h3>Esta playlist no tiene canciones aún</h3><p>Agrega algunas canciones para comenzar</p></div>';
+
+        songsSection.innerHTML = songsHTML;
+    } else {
+        // Si no existe la sección, reemplazar el contenido vacío
+        const emptySection = document.querySelector('.empty-songs');
+        if (emptySection && songs.length > 0) {
+            const newSongsSection = document.createElement('div');
+            newSongsSection.className = 'playlist-songs';
+            newSongsSection.innerHTML = `
+                <h4>Canciones (${songs.length})</h4>
+                <div class="songs-list">
+                    ${songs.map(song => `
+                        <div class="song-item" data-song-id="${song.id}">
+                            <div class="song-cover">
+                                ${song.imageUrl ?
+                                    `<img src="${song.imageUrl}" alt="${song.titulo}" style="width: 50px; height: 50px; border-radius: 6px; object-fit: cover;">` :
+                                    '<div style="width: 50px; height: 50px; background: linear-gradient(135deg, var(--spotify-purple), var(--distrital-gold)); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">🎵</div>'
+                                }
+                            </div>
+                            <div class="song-info">
+                                <h5>${song.titulo}</h5>
+                                <p>${song.artista} - ${song.album}</p>
+                            </div>
+                            ${currentUser && playlist.usuario?.usuario === currentUser.usuario ?
+                                `<button class="btn-remove-song" onclick="removeSongFromPlaylist(${playlist.id}, ${song.id})">
+                                    <span class="material-icons">remove</span>
+                                </button>` : ''
+                            }
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            emptySection.replaceWith(newSongsSection);
+        }
+    }
+}
 
 // ✅ FUNCIÓN PARA AGREGAR CANCIÓN A PLAYLIST 
 /**
@@ -650,6 +741,9 @@ async function addSongToPlaylist(playlistId, songId, buttonElement) {
             // Recargar las canciones de la playlist actual
             await refreshCurrentPlaylistSongs(playlistId);
             
+            // ✅ ACTUALIZAR EL MODAL DE DETALLES SI ESTÁ ABIERTO (SIN REABRIRLO)
+            updatePlaylistDetailModalIfOpen(playlistId);
+            
         } else {
             const errorText = await response.text();
             if (errorText.includes('ya existe') || errorText.includes('duplicate')) {
@@ -688,7 +782,7 @@ async function refreshCurrentPlaylistSongs(playlistId) {
             currentPlaylistSongs = await response.json();
         }
     } catch (error) {
-        showMessage('Error al actualizar las canciones de la playlist', 'error');
+        console.error('Error al actualizar las canciones de la playlist:', error);
     }
 }
 
@@ -762,11 +856,7 @@ function closeAddSongsModal() {
         modal.style.animation = 'fadeOut 0.3s ease-out';
         setTimeout(() => {
             modal.remove();
-            
-            // ✅ SOLO AGREGAR ESTA LÍNEA
-            if (selectedPlaylistForSongs) {
-                viewPlaylistDetails(selectedPlaylistForSongs);
-            }
+            // ❌ ELIMINADO EL CÓDIGO PROBLEMÁTICO QUE REABRÍA EL MODAL
         }, 300);
     }
 }
@@ -825,6 +915,109 @@ async function loadPublicPlaylists() {
     }
 }
 
+/**
+ * Muestra el modal de confirmación para eliminar una playlist
+ * @param {number} playlistId - ID de la playlist a eliminar
+ * @param {string} playlistName - Nombre de la playlist para mostrar en la confirmación
+ * @description Abre un modal de confirmación con advertencias sobre la eliminación
+ */
+function confirmDeletePlaylist(playlistId, playlistName) {
+    const modal = document.getElementById('confirmDeletePlaylistModal');
+    const playlistNameSpan = document.getElementById('playlistToDeleteName');
+    
+    if (playlistNameSpan) {
+        playlistNameSpan.textContent = playlistName;
+    }
+    
+    // Guardar el ID para usar en la confirmación
+    window.playlistToDelete = playlistId;
+    
+    modal.style.display = 'block';
+}
+
+// ✅ NUEVA FUNCIÓN - Eliminar playlist
+/**
+ * Elimina una playlist del usuario actual
+ * @async
+ * @param {number} playlistId - ID de la playlist a eliminar
+ * @throws {Error} Si hay problemas de conexión o permisos
+ * @returns {Promise<void>}
+ * @description Solicita confirmación y envía la petición de eliminación al backend
+ */
+async function deletePlaylist(playlistId) {
+    if (!confirm('¿Estás seguro de que quieres eliminar esta playlist? Esta acción no se puede deshacer.')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/playlists/${playlistId}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            showMessage('🗑️ Playlist eliminada exitosamente', 'success');
+            
+            // Recargar las playlists
+            loadMyPlaylists();
+            
+            // Cerrar modal si está abierto
+            const detailModal = document.getElementById('playlistDetailModal');
+            if (detailModal && detailModal.style.display === 'block') {
+                detailModal.style.display = 'none';
+            }
+            
+        } else {
+            const errorText = await response.text();
+            console.error('Error del servidor:', errorText);
+            showMessage(errorText || 'Error al eliminar la playlist', 'error');
+        }
+    } catch (error) {
+        console.error('Error al eliminar playlist:', error);
+        showMessage('Error de conexión al eliminar playlist', 'error');
+    }
+}
+
+// ✅ NUEVA FUNCIÓN - Editar playlist
+/**
+ * Abre el modal de edición para una playlist existente
+ * @async
+ * @param {number} playlistId - ID de la playlist a editar
+ * @throws {Error} Si hay problemas al cargar los datos de la playlist
+ * @returns {Promise<void>}
+ * @description Carga los datos actuales de la playlist y abre el modal de edición
+ */
+async function editPlaylist(playlistId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/playlists/${playlistId}`);
+        if (!response.ok) {
+            throw new Error('Error cargando playlist');
+        }
+        
+        const playlist = await response.json();
+        
+        // Verificar que el usuario sea el propietario
+        if (!currentUser || playlist.usuario?.usuario !== currentUser.usuario) {
+            showMessage('❌ No tienes permiso para editar esta playlist', 'error');
+            return;
+        }
+        
+        // Guardar ID para la edición
+        editingPlaylistId = playlistId;
+        
+        // Llenar el formulario con los datos actuales
+        document.getElementById('editPlaylistName').value = playlist.nombre || '';
+        document.getElementById('editPlaylistImage').value = playlist.imageUrl || '';
+        document.getElementById('editIsPublic').checked = playlist.esPublica || false;
+        
+        // Mostrar modal de edición
+        document.getElementById('editPlaylistModal').style.display = 'block';
+        
+    } catch (error) {
+        console.error('❌ Error loading playlist for edit:', error);
+        showMessage('Error al cargar los datos de la playlist', 'error');
+    }
+}
+
 function renderPlaylists(playlists, container, isOwner = false) {
     if (!playlists || playlists.length === 0) {
         container.innerHTML = `
@@ -845,12 +1038,25 @@ function renderPlaylists(playlists, container, isOwner = false) {
             `<img src="${playlist.imageUrl}" alt="${playlist.nombre}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">` :
             '🎵';
 
+        // ✅ NUEVO - Botones de acción solo para playlists propias
+        const actionButtons = isOwner && currentUser && playlist.usuario?.usuario === currentUser.usuario ? `
+            <div class="playlist-actions">
+                <button class="playlist-action-btn edit" onclick="editPlaylist(${playlist.id})" title="Editar playlist">
+                    <span class="material-icons">edit</span>
+                </button>
+                <button class="playlist-action-btn delete" onclick="confirmDeletePlaylist(${playlist.id}, '${playlist.nombre.replace(/'/g, "\\'")}')" title="Eliminar playlist">
+                    <span class="material-icons">delete</span>
+                </button>
+            </div>
+        ` : '';
+
         return `
-            <div class="playlist-card" data-playlist-id="${playlist.id}" onclick="viewPlaylistDetails(${playlist.id})">
-                <div class="playlist-cover">
+            <div class="playlist-card" data-playlist-id="${playlist.id}">
+                ${actionButtons}
+                <div class="playlist-cover" onclick="viewPlaylistDetails(${playlist.id})">
                     ${imageContent}
                 </div>
-                <div class="playlist-info">
+                <div class="playlist-info" onclick="viewPlaylistDetails(${playlist.id})">
                     <h3>${playlist.nombre}</h3>
                     <p>Por: ${ownerName}</p>
                     <div class="playlist-meta">
@@ -865,6 +1071,157 @@ function renderPlaylists(playlists, container, isOwner = false) {
     }).join('');
 
     container.innerHTML = playlistsHTML;
+}
+
+/**
+ * Procesa el formulario de edición de playlist
+ * @async
+ * @param {Event} event - Evento del formulario
+ * @throws {Error} Si hay problemas de validación o conexión
+ * @returns {Promise<void>}
+ * @description Valida y envía los datos actualizados de la playlist al servidor
+ */
+async function handleEditPlaylist(event) {
+    event.preventDefault();
+    
+    if (!editingPlaylistId) {
+        showMessage('❌ Error: No se ha seleccionado playlist para editar', 'error');
+        return;
+    }
+
+    const playlistName = document.getElementById('editPlaylistName').value.trim();
+    const playlistImage = document.getElementById('editPlaylistImage').value.trim();
+    const isPublic = document.getElementById('editIsPublic').checked;
+
+    if (!playlistName) {
+        showMessage('❌ El nombre de la playlist es obligatorio', 'error');
+        return;
+    }
+
+    // Validar URL de imagen si se proporciona
+    if (playlistImage && !isValidUrl(playlistImage)) {
+        showMessage('❌ La URL de la imagen no es válida', 'error');
+        return;
+    }
+
+    const playlistData = {
+        nombre: playlistName,
+        esPublica: isPublic,
+        imageUrl: playlistImage || null
+    };
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/playlists/${editingPlaylistId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(playlistData)
+        });
+
+        if (response.ok) {
+            const updatedPlaylist = await response.json();
+            showMessage('✅ Playlist actualizada exitosamente', 'success');
+            
+            // Cerrar modal de edición
+            document.getElementById('editPlaylistModal').style.display = 'none';
+            document.getElementById('editPlaylistForm').reset();
+            editingPlaylistId = null;
+            
+            // Recargar las playlists
+            loadMyPlaylists();
+            
+        } else {
+            const errorData = await response.text();
+            showMessage(`❌ Error al actualizar playlist: ${errorData}`, 'error');
+        }
+    } catch (error) {
+        console.error('❌ Error updating playlist:', error);
+        showMessage('🌐 Error de conexión al actualizar playlist', 'error');
+    }
+}
+
+// ✅ NUEVA FUNCIÓN - Confirmar eliminación de cuenta
+/**
+ * Muestra el modal de confirmación para eliminar la cuenta del usuario
+ * @description Abre un modal con advertencias sobre la eliminación permanente de la cuenta
+ */
+function confirmDeleteAccount() {
+    const modal = document.getElementById('confirmDeleteAccountModal');
+    
+    // Limpiar el campo de contraseña
+    document.getElementById('confirmDeletePassword').value = '';
+    
+    modal.style.display = 'block';
+}
+
+/**
+ * Elimina completamente la cuenta del usuario actual
+ * @async
+ * @throws {Error} Si hay problemas de validación o conexión
+ * @returns {Promise<void>}
+ * @description Solicita confirmación y contraseña, luego elimina toda la información
+ * del usuario incluyendo playlists, comentarios y relaciones sociales
+ */
+async function deleteUserAccount() {
+    // Primera confirmación
+    if (!confirm('⚠️ ¿ESTÁS COMPLETAMENTE SEGURO?\n\nEsta acción eliminará permanentemente:\n• Tu cuenta de usuario\n• Todas tus playlists\n• Todos tus comentarios\n• Todas tus relaciones sociales\n\n❌ ESTA ACCIÓN NO SE PUEDE DESHACER')) {
+        return;
+    }
+
+    // Segunda confirmación más específica
+    const confirmText = prompt('Para confirmar, escribe "ELIMINAR" en mayúsculas:');
+    if (confirmText !== 'ELIMINAR') {
+        showMessage('Eliminación cancelada', 'info');
+        return;
+    }
+
+    // Solicitar contraseña
+    const password = prompt('Por seguridad, ingresa tu contraseña actual:');
+    if (!password) {
+        showMessage('Eliminación cancelada - contraseña requerida', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/users/${currentUser.usuario}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                password: password
+            })
+        });
+
+        if (response.ok) {
+            showMessage('Cuenta eliminada exitosamente. Redirigiendo...', 'success');
+            
+            // Limpiar datos locales
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('currentUser');
+            
+            // Redireccionar después de 2 segundos
+            setTimeout(() => {
+                window.location.href = 'auth.html';
+            }, 2000);
+            
+        } else {
+            const errorData = await response.text();
+            console.error('Error del servidor:', errorData);
+            
+            if (response.status === 400 && errorData.includes('contraseña')) {
+                showMessage('❌ Contraseña incorrecta', 'error');
+            } else if (response.status === 404) {
+                showMessage('❌ Usuario no encontrado', 'error');
+            } else {
+                showMessage(errorData || 'Error al eliminar la cuenta', 'error');
+            }
+        }
+    } catch (error) {
+        console.error('Error al eliminar cuenta:', error);
+        showMessage('Error de conexión al eliminar cuenta', 'error');
+    }
 }
 
 
@@ -940,6 +1297,55 @@ function selectSong(songId) {
     showMessage(`🎵 Canción seleccionada. Funcionalidad en desarrollo para reproducir.`, 'info');
 }
 
+/**
+ * Muestra un modal más amigable para confirmar eliminación de playlist
+ * @param {number} playlistId - ID de la playlist a eliminar
+ * @param {string} playlistName - Nombre de la playlist para mostrar en confirmación
+ */
+function showDeletePlaylistModal(playlistId, playlistName) {
+    const modalHTML = `
+        <div id="deletePlaylistModal" class="modal" style="display: block;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>🗑️ Eliminar Playlist</h3>
+                    <span class="close" onclick="closeDeletePlaylistModal()">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="delete-warning">
+                        <span class="material-icons" style="font-size: 48px; color: #ef4444;">warning</span>
+                        <h4>¿Estás seguro?</h4>
+                        <p>Vas a eliminar la playlist <strong>"${playlistName}"</strong></p>
+                        <p style="color: #ef4444; font-weight: bold;">⚠️ Esta acción no se puede deshacer</p>
+                    </div>
+                    <div class="modal-actions" style="margin-top: 24px; display: flex; gap: 12px; justify-content: center;">
+                        <button class="btn-secondary" onclick="closeDeletePlaylistModal()">
+                            <span class="material-icons">close</span>
+                            Cancelar
+                        </button>
+                        <button class="btn-danger" onclick="confirmDeletePlaylist(${playlistId})">
+                            <span class="material-icons">delete_forever</span>
+                            Eliminar Definitivamente
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+function closeDeletePlaylistModal() {
+    const modal = document.getElementById('deletePlaylistModal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+function confirmDeletePlaylist(playlistId) {
+    closeDeletePlaylistModal();
+    deletePlaylist(playlistId);
+}
 /**
  * Crea una nueva playlist en el sistema
  * @async
@@ -1749,6 +2155,107 @@ document.addEventListener('DOMContentLoaded', function () {
     if (removeProfileImageBtn) {
         removeProfileImageBtn.addEventListener('click', removeProfileImage);
     }
+    // Event listeners para modal de edición de playlist
+    const editPlaylistModal = document.getElementById('editPlaylistModal');
+    const closeEditModal = document.getElementById('closeEditModal');
+    const cancelEditModal = document.getElementById('cancelEditModal');
+    const editPlaylistForm = document.getElementById('editPlaylistForm');
+
+    if (closeEditModal) {
+        closeEditModal.addEventListener('click', () => {
+            editPlaylistModal.style.display = 'none';
+            editingPlaylistId = null;
+        });
+    }
+
+    if (cancelEditModal) {
+        cancelEditModal.addEventListener('click', () => {
+            editPlaylistModal.style.display = 'none';
+            editingPlaylistId = null;
+        });
+    }
+
+    if (editPlaylistModal) {
+        editPlaylistModal.addEventListener('click', (e) => {
+            if (e.target === editPlaylistModal) {
+                editPlaylistModal.style.display = 'none';
+                editingPlaylistId = null;
+            }
+        });
+    }
+
+    if (editPlaylistForm) {
+        editPlaylistForm.addEventListener('submit', handleEditPlaylist);
+    }
+
+    // Event listeners para modal de confirmación de eliminación de playlist
+    const confirmDeletePlaylistModal = document.getElementById('confirmDeletePlaylistModal');
+    const closeConfirmDeleteModal = document.getElementById('closeConfirmDeleteModal');
+    const cancelDeletePlaylist = document.getElementById('cancelDeletePlaylist');
+    const confirmDeletePlaylistBtn = document.getElementById('confirmDeletePlaylist');
+
+    if (closeConfirmDeleteModal) {
+        closeConfirmDeleteModal.addEventListener('click', () => {
+            confirmDeletePlaylistModal.style.display = 'none';
+        });
+    }
+
+    if (cancelDeletePlaylist) {
+        cancelDeletePlaylist.addEventListener('click', () => {
+            confirmDeletePlaylistModal.style.display = 'none';
+        });
+    }
+
+    if (confirmDeletePlaylistModal) {
+        confirmDeletePlaylistModal.addEventListener('click', (e) => {
+            if (e.target === confirmDeletePlaylistModal) {
+                confirmDeletePlaylistModal.style.display = 'none';
+            }
+        });
+    }
+
+    if (confirmDeletePlaylistBtn) {
+        confirmDeletePlaylistBtn.addEventListener('click', () => {
+            if (window.playlistToDelete) {
+                deletePlaylist(window.playlistToDelete);
+            }
+        });
+    }
+
+    // Event listeners para modal de confirmación de eliminación de cuenta
+    const btnDeleteAccount = document.getElementById('btnDeleteAccount');
+    const confirmDeleteAccountModal = document.getElementById('confirmDeleteAccountModal');
+    const closeConfirmDeleteAccountModal = document.getElementById('closeConfirmDeleteAccountModal');
+    const cancelDeleteAccount = document.getElementById('cancelDeleteAccount');
+    const confirmDeleteAccountBtn = document.getElementById('confirmDeleteAccount');
+
+    if (btnDeleteAccount) {
+        btnDeleteAccount.addEventListener('click', confirmDeleteAccount);
+    }
+
+    if (closeConfirmDeleteAccountModal) {
+        closeConfirmDeleteAccountModal.addEventListener('click', () => {
+            confirmDeleteAccountModal.style.display = 'none';
+        });
+    }
+
+    if (cancelDeleteAccount) {
+        cancelDeleteAccount.addEventListener('click', () => {
+            confirmDeleteAccountModal.style.display = 'none';
+        });
+    }
+
+    if (confirmDeleteAccountModal) {
+        confirmDeleteAccountModal.addEventListener('click', (e) => {
+            if (e.target === confirmDeleteAccountModal) {
+                confirmDeleteAccountModal.style.display = 'none';
+            }
+        });
+    }
+
+    if (confirmDeleteAccountBtn) {
+        confirmDeleteAccountBtn.addEventListener('click', deleteUserAccount);
+    }
 
     console.log('✅ Dashboard inicializado correctamente');
 });
@@ -1763,3 +2270,10 @@ window.addSongToPlaylist = addSongToPlaylist;
 window.removeSongFromPlaylist = removeSongFromPlaylist;
 window.closeAddSongsModal = closeAddSongsModal;
 window.viewUserProfile = viewUserProfile;
+window.editPlaylist = editPlaylist;
+window.confirmDeletePlaylist = confirmDeletePlaylist;
+window.deletePlaylist = deletePlaylist;
+
+window.deleteUserAccount = deleteUserAccount;
+window.showDeletePlaylistModal = showDeletePlaylistModal;
+window.closeDeletePlaylistModal = closeDeletePlaylistModal;
