@@ -804,6 +804,11 @@ function closeAddSongsModal() {
         modal.style.animation = 'fadeOut 0.3s ease-out';
         setTimeout(() => {
             modal.remove();
+            
+            // ✅ SOLO AGREGAR ESTA LÍNEA
+            if (selectedPlaylistForSongs) {
+                viewPlaylistDetails(selectedPlaylistForSongs);
+            }
         }, 300);
     }
 }
@@ -1789,6 +1794,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     console.log('✅ Dashboard inicializado correctamente');
 });
+
 
 // FUNCIONES GLOBALES
 window.viewPlaylistDetails = viewPlaylistDetails;
