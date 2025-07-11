@@ -175,7 +175,7 @@ body {
     border-color: var(--spotify-purple);
 }
 
-/* Main Content - CORREGIDO PARA SCROLL */
+/* Main Content */
 .main-content {
     margin-top: 80px;
     min-height: calc(100vh - 80px);
@@ -296,7 +296,7 @@ body {
     color: var(--spotify-white);
 }
 
-/* Search Results - NUEVO */
+/* Search Results */
 .search-results {
     margin-bottom: 32px;
     background: rgba(255, 255, 255, 0.05);
@@ -359,7 +359,7 @@ body {
     color: var(--spotify-light-gray);
 }
 
-/* Playlists Grid - MEJORADO */
+/* Playlists Grid */
 .playlists-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -466,7 +466,7 @@ body {
     border: 1px solid rgba(107, 114, 128, 0.3);
 }
 
-/* Filters Section - NUEVO */
+/* Filters Section */
 .filters {
     display: flex;
     justify-content: flex-end;
@@ -474,7 +474,7 @@ body {
     gap: 16px;
 }
 
-/* ✅ MODAL MEJORADO CON SCROLL CORREGIDO */
+/* ✅ MODAL MEJORADO Y CORREGIDO */
 .modal {
     display: none;
     position: fixed;
@@ -588,7 +588,7 @@ body {
     transform: scale(1.1);
 }
 
-/* ✅ CONTENIDO DEL MODAL CON SCROLL CORREGIDO */
+/* ✅ CONTENIDO DEL MODAL ESTRUCTURADO */
 .modal-body {
     padding: 24px;
     background: var(--spotify-dark-gray);
@@ -597,84 +597,28 @@ body {
     min-height: 0;
 }
 
+/* ✅ ESTRUCTURA ORGANIZADA DEL MODAL DE PLAYLIST */
 .playlist-detail-content {
     display: flex;
     flex-direction: column;
+    gap: 24px;
     max-height: calc(80vh - 120px);
     overflow-y: auto;
 }
 
-/* ✅ FORM GROUPS MEJORADOS */
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--spotify-white);
-    font-weight: 500;
-    font-size: 14px;
-}
-
-.form-group input[type="text"],
-.form-group input[type="url"] {
-    width: 100%;
-    padding: 12px 16px;
+/* ✅ SECCIÓN DE INFORMACIÓN DE PLAYLIST */
+.playlist-info-section {
+    background: rgba(255, 255, 255, 0.03);
     border-radius: 12px;
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--spotify-white);
-    font-size: 14px;
-    transition: all 0.3s ease;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.form-group input[type="text"]:focus,
-.form-group input[type="url"]:focus {
-    outline: none;
-    border-color: var(--spotify-purple);
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
-}
-
-.form-group small {
-    display: block;
-    margin-top: 4px;
-    color: var(--spotify-light-gray);
-    font-size: 12px;
-}
-
-.checkbox-label {
-    display: flex !important;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    margin-bottom: 0 !important;
-}
-
-.checkbox-label input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    margin: 0;
-}
-
-.modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    margin-top: 24px;
-    padding-top: 24px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* ✅ PLAYLIST INFO MEJORADA */
 .playlist-info .playlist-meta {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    margin-bottom: 20px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 0;
 }
 
 .playlist-info .playlist-meta span {
@@ -682,41 +626,78 @@ body {
     font-size: 14px;
 }
 
-/* ✅ SONG ITEMS MEJORADOS CON SCROLL */
-.playlist-songs {
-    flex: 1;
-    min-height: 0;
+/* ✅ SECCIÓN DE ACCIONES PRINCIPALES - FIJA EN LA PARTE SUPERIOR */
+.playlist-main-actions {
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(10px);
 }
 
-.playlist-songs h4 {
+.playlist-main-actions h4 {
     color: var(--spotify-white);
     font-size: 18px;
     font-weight: 600;
-    margin-bottom: 16px;
-    padding-bottom: 8px;
+    margin: 0;
+    flex: 1;
+}
+
+.playlist-actions-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* ✅ SECCIÓN DE CANCIONES CON SCROLL INDEPENDIENTE */
+.playlist-songs-section {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+}
+
+.playlist-songs-header {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 16px 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     position: sticky;
     top: 0;
-    background: var(--spotify-dark-gray);
-    z-index: 10;
+    z-index: 5;
 }
 
-.songs-list {
+.playlist-songs-header h4 {
+    color: var(--spotify-white);
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.playlist-songs-list {
     max-height: 400px;
     overflow-y: auto;
-    padding-right: 8px;
+    padding: 8px;
 }
 
+/* ✅ SONG ITEMS MEJORADOS */
 .song-item {
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 16px;
+    padding: 12px 16px;
     border-radius: 12px;
     transition: all 0.3s ease;
-    margin-bottom: 12px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     position: relative;
     overflow: hidden;
 }
@@ -750,8 +731,8 @@ body {
 
 .song-cover {
     flex-shrink: 0;
-    width: 56px;
-    height: 56px;
+    width: 48px;
+    height: 48px;
     border-radius: 8px;
     overflow: hidden;
     position: relative;
@@ -770,7 +751,7 @@ body {
 
 .song-info h5 {
     margin-bottom: 4px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--spotify-white);
     line-height: 1.3;
@@ -781,7 +762,7 @@ body {
 
 .song-info p {
     color: var(--spotify-light-gray);
-    font-size: 13px;
+    font-size: 12px;
     margin: 0;
     opacity: 0.8;
     overflow: hidden;
@@ -791,8 +772,8 @@ body {
 
 /* ✅ BOTONES DE ACCIÓN MEJORADOS */
 .btn-add-song, .btn-remove-song {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     border: none;
     display: flex;
@@ -800,7 +781,7 @@ body {
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-size: 18px;
+    font-size: 16px;
     position: relative;
     z-index: 2;
     flex-shrink: 0;
@@ -842,12 +823,166 @@ body {
     box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
 }
 
-/* ✅ AVAILABLE SONGS CON SCROLL MEJORADO */
+/* ✅ SECCIÓN DE COMENTARIOS ORGANIZADA */
+.playlist-comments-section {
+    background: rgba(30, 20, 50, 0.5);
+    border-radius: 12px;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.comments-header {
+    background: rgba(139, 92, 246, 0.1);
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.comments-header h4 {
+    color: var(--spotify-white);
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.comments-header h4::before {
+    content: '💬';
+    font-size: 16px;
+}
+
+.comments-content {
+    padding: 16px 20px;
+}
+
+.comments-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 16px;
+}
+
+.comment-item {
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    background: rgba(60, 40, 90, 0.3);
+    border-radius: 12px;
+    border: 1px solid rgba(139, 92, 246, 0.1);
+    transition: all 0.3s ease;
+}
+
+.comment-item:hover {
+    background: rgba(60, 40, 90, 0.5);
+    border-color: rgba(139, 92, 246, 0.3);
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+.comment-user {
+    font-weight: 600;
+    color: var(--spotify-white);
+}
+
+.comment-date {
+    color: var(--spotify-light-gray);
+    font-style: italic;
+}
+
+.comment-content {
+    color: var(--spotify-white);
+    font-size: 14px;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.comment-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: 8px;
+}
+
+.btn-delete-comment {
+    background: none;
+    border: none;
+    color: var(--spotify-light-gray);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.btn-delete-comment:hover {
+    color: var(--error-color);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.comment-form {
+    display: flex;
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(139, 92, 246, 0.1);
+}
+
+.comment-input {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 20px;
+    border: 2px solid rgba(139, 92, 246, 0.3);
+    background: rgba(26, 16, 42, 0.8);
+    color: var(--spotify-white);
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.comment-input:focus {
+    outline: none;
+    border-color: var(--spotify-purple);
+    background: rgba(26, 16, 42, 1);
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+}
+
+.comment-input::placeholder {
+    color: var(--spotify-light-gray);
+}
+
+.comment-submit {
+    padding: 12px 20px;
+    border-radius: 20px;
+    background: var(--spotify-purple);
+    color: var(--spotify-white);
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.comment-submit:hover {
+    background: var(--spotify-dark-purple);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+.comment-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ✅ AVAILABLE SONGS MODAL MEJORADO */
 .available-songs {
     max-height: 500px;
     overflow-y: auto;
-    padding-right: 8px;
-    margin-top: 16px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .songs-info {
@@ -855,48 +990,81 @@ body {
     color: var(--spotify-light-gray);
     font-size: 14px;
     padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(139, 92, 246, 0.1);
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* ✅ PLAYLIST ACTIONS */
-.playlist-actions {
-    margin-top: 24px;
-    padding-top: 24px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.2);
     text-align: center;
 }
 
-/* ✅ SCROLLBAR PERSONALIZADO */
-.songs-list::-webkit-scrollbar,
-.available-songs::-webkit-scrollbar,
-.playlist-detail-content::-webkit-scrollbar,
-.search-results::-webkit-scrollbar {
-    width: 8px;
+/* ✅ FORM GROUPS MEJORADOS */
+.form-group {
+    margin-bottom: 20px;
 }
 
-.songs-list::-webkit-scrollbar-track,
-.available-songs::-webkit-scrollbar-track,
-.playlist-detail-content::-webkit-scrollbar-track,
-.search-results::-webkit-scrollbar-track {
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--spotify-white);
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="url"],
+.form-group input[type="email"],
+.form-group input[type="password"] {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--spotify-white);
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="url"]:focus,
+.form-group input[type="email"]:focus,
+.form-group input[type="password"]:focus {
+    outline: none;
+    border-color: var(--spotify-purple);
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
 }
 
-.songs-list::-webkit-scrollbar-thumb,
-.available-songs::-webkit-scrollbar-thumb,
-.playlist-detail-content::-webkit-scrollbar-thumb,
-.search-results::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, var(--spotify-purple) 0%, var(--spotify-dark-purple) 100%);
-    border-radius: 4px;
+.form-group input::placeholder {
+    color: var(--spotify-light-gray);
 }
 
-.songs-list::-webkit-scrollbar-thumb:hover,
-.available-songs::-webkit-scrollbar-thumb:hover,
-.playlist-detail-content::-webkit-scrollbar-thumb:hover,
-.search-results::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, var(--spotify-dark-purple) 0%, #6d28d9 100%);
+.form-group small {
+    display: block;
+    margin-top: 4px;
+    color: var(--spotify-light-gray);
+    font-size: 12px;
+}
+
+.checkbox-label {
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    margin-bottom: 0 !important;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* ✅ ESTADOS VACÍOS MEJORADOS */
@@ -911,23 +1079,264 @@ body {
     text-align: center;
     padding: 40px 20px;
     color: var(--spotify-light-gray);
-    margin-top: 24px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin: 16px;
 }
 
-.empty-state h3, .empty-songs h3 {
+.empty-comments {
+    text-align: center;
+    padding: 32px 20px;
+    color: var(--spotify-light-gray);
+    font-style: italic;
+}
+
+.empty-comments.error {
+    color: var(--error-color);
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.empty-state h3, .empty-songs h3, .empty-comments h3 {
     margin-bottom: 8px;
     color: var(--spotify-white);
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 600;
 }
 
-.empty-state p, .empty-songs p {
+.empty-state p, .empty-songs p, .empty-comments p {
     font-size: 14px;
     opacity: 0.8;
 }
 
-/* ✅ ANIMACIONES MEJORADAS */
+/* ✅ SCROLLBAR PERSONALIZADO */
+.playlist-songs-list::-webkit-scrollbar,
+.available-songs::-webkit-scrollbar,
+.playlist-detail-content::-webkit-scrollbar,
+.search-results::-webkit-scrollbar,
+.comments-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.playlist-songs-list::-webkit-scrollbar-track,
+.available-songs::-webkit-scrollbar-track,
+.playlist-detail-content::-webkit-scrollbar-track,
+.search-results::-webkit-scrollbar-track,
+.comments-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.playlist-songs-list::-webkit-scrollbar-thumb,
+.available-songs::-webkit-scrollbar-thumb,
+.playlist-detail-content::-webkit-scrollbar-thumb,
+.search-results::-webkit-scrollbar-thumb,
+.comments-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--spotify-purple) 0%, var(--spotify-dark-purple) 100%);
+    border-radius: 4px;
+}
+
+.playlist-songs-list::-webkit-scrollbar-thumb:hover,
+.available-songs::-webkit-scrollbar-thumb:hover,
+.playlist-detail-content::-webkit-scrollbar-thumb:hover,
+.search-results::-webkit-scrollbar-thumb:hover,
+.comments-list::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--spotify-dark-purple) 0%, #6d28d9 100%);
+}
+
+/* ✅ PERFIL DE USUARIO MODAL */
+.profile-avatar-section {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 32px;
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.current-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--spotify-purple) 0%, var(--distrital-gold) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
+    color: var(--spotify-white);
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.current-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.current-avatar .material-icons {
+    font-size: 60px;
+}
+
+.avatar-options {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.avatar-options h4 {
+    color: var(--spotify-white);
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.form-section {
+    margin-bottom: 32px;
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.form-section h4 {
+    color: var(--spotify-white);
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-section h4::before {
+    content: '';
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(135deg, var(--spotify-purple) 0%, var(--distrital-gold) 100%);
+    border-radius: 2px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.stat-number {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--spotify-purple);
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--spotify-light-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#removeProfileImage {
+    align-self: flex-start;
+    padding: 8px 16px;
+    font-size: 13px;
+}
+
+#removeProfileImage .material-icons {
+    font-size: 18px;
+}
+
+.modal-actions .btn-primary {
+    background: linear-gradient(135deg, var(--spotify-purple) 0%, var(--spotify-dark-purple) 100%);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+.modal-actions .btn-primary:hover {
+    background: linear-gradient(135deg, var(--spotify-dark-purple) 0%, #6d28d9 100%);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+    transform: translateY(-2px);
+}
+
+.form-group input.error {
+    border-color: var(--error-color);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.form-group input.success {
+    border-color: var(--success-color);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.form-group .error-message {
+    color: var(--error-color);
+    font-size: 12px;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.form-group .error-message::before {
+    content: '⚠️';
+    font-size: 12px;
+}
+
+.image-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.profile-avatar-section.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.profile-avatar-section.loading .current-avatar::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 24px;
+    height: 24px;
+    margin: -12px 0 0 -12px;
+    border: 3px solid var(--spotify-light-gray);
+    border-top-color: var(--spotify-purple);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* ✅ ANIMACIONES ADICIONALES */
 @keyframes slideInRight {
     from {
         transform: translateX(100%);
@@ -961,201 +1370,11 @@ body {
     }
 }
 
-/* ✅ RESPONSIVE MEJORADO */
-@media (max-width: 1024px) {
-    .playlists-grid {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 20px;
-    }
-    
-    .stats-compact {
-        gap: 20px;
-    }
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
 
-@media (max-width: 768px) {
-    .header .container {
-        flex-direction: column;
-        gap: 16px;
-        padding: 16px 20px;
-    }
-    
-    .nav {
-        gap: 16px;
-    }
-    
-    .user-menu {
-        flex-direction: column;
-        gap: 12px;
-        align-items: center;
-    }
-    
-    .main-content {
-        margin-top: 120px;
-        max-height: calc(100vh - 120px);
-    }
-    
-    .modal {
-        padding: 10px;
-    }
-    
-    .modal-content {
-        width: 95%;
-        margin: 10px auto;
-        border-radius: 16px;
-        max-height: calc(100vh - 20px);
-    }
-    
-    .modal-content.large {
-        width: 95%;
-        max-height: calc(100vh - 20px);
-        margin: 10px auto;
-    }
-    
-    .modal-header {
-        padding: 16px 20px;
-    }
-    
-    .modal-header h3 {
-        font-size: 18px;
-        padding-right: 40px;
-    }
-    
-    .modal-body {
-        padding: 16px;
-    }
-    
-    .song-item {
-        padding: 12px;
-        gap: 12px;
-    }
-    
-    .song-cover {
-        width: 48px;
-        height: 48px;
-    }
-    
-    .song-info h5 {
-        font-size: 14px;
-    }
-    
-    .song-info p {
-        font-size: 12px;
-    }
-    
-    .btn-add-song, .btn-remove-song {
-        width: 36px;
-        height: 36px;
-        font-size: 16px;
-    }
-    
-    .playlists-grid {
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 16px;
-    }
-    
-    .playlist-card {
-        padding: 16px;
-    }
-    
-    .playlist-cover {
-        height: 120px;
-        font-size: 36px;
-    }
-    
-    .stats-compact {
-        flex-direction: column;
-        gap: 16px;
-        align-items: center;
-    }
-    
-    .stat-item {
-        min-width: 150px;
-    }
-    
-    .search-container {
-        flex-direction: column;
-        gap: 12px;
-    }
-    
-    .btn-search {
-        width: 100%;
-        height: 48px;
-        border-radius: 24px;
-    }
-    
-    .section-title {
-        flex-direction: column;
-        gap: 16px;
-        align-items: flex-start;
-    }
-    
-    .filters {
-        justify-content: center;
-    }
-}
-
-@media (max-width: 480px) {
-    .container {
-        padding: 0 16px;
-    }
-    
-    .main-content {
-        padding: 16px 0;
-    }
-    
-    .modal-content {
-        border-radius: 12px;
-    }
-    
-    .modal-header {
-        padding: 12px 16px;
-    }
-    
-    .modal-body {
-        padding: 12px;
-    }
-    
-    .song-item {
-        padding: 8px;
-        gap: 8px;
-    }
-    
-    .song-cover {
-        width: 40px;
-        height: 40px;
-    }
-    
-    .btn-add-song, .btn-remove-song {
-        width: 32px;
-        height: 32px;
-        font-size: 14px;
-    }
-    
-    .playlists-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
-    
-    .playlist-cover {
-        height: 100px;
-        font-size: 28px;
-    }
-    
-    .search-results {
-        padding: 12px;
-    }
-    
-    .available-songs {
-        max-height: 300px;
-    }
-    
-    .songs-list {
-        max-height: 250px;
-    }
-}
-
-/* ✅ LOADING Y ESTADOS ESPECIALES */
+/* ✅ LOADING STATES */
 .loading {
     display: flex;
     justify-content: center;
@@ -1176,11 +1395,7 @@ body {
     margin-left: 12px;
 }
 
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* ✅ MEJORAS VISUALES ADICIONALES */
+/* ✅ EFECTOS VISUALES MEJORADOS */
 .playlist-card {
     backdrop-filter: blur(10px);
 }
@@ -1329,264 +1544,239 @@ body {
     background: linear-gradient(145deg, rgba(26, 26, 26, 0.9) 0%, rgba(45, 27, 105, 0.3) 1%, rgba(26, 26, 26, 0.9) 100%);
     backdrop-filter: blur(20px);
 }
-/* ✅ CSS PARA MODAL DE PERFIL - Agregar al dashboard.css */
 
-/* Sección de Avatar */
-.profile-avatar-section {
+/* ✅ MODAL DE PERFIL DE USUARIO ADICIONAL */
+.user-profile-modal-content {
     display: flex;
-    gap: 24px;
-    margin-bottom: 32px;
-    padding: 24px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 16px 16px;
+    min-width: 280px;
 }
 
-.current-avatar {
-    width: 120px;
-    height: 120px;
+.profile-avatar-modal-container {
+    margin-bottom: 12px;
+}
+
+.profile-avatar-modal {
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--spotify-purple) 0%, var(--distrital-gold) 100%);
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    background: #f3f3f3;
+    display: block;
+}
+
+.profile-avatar-emoji {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--spotify-purple), var(--distrital-gold));
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 60px;
+    font-size: 40px;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
+/* ✅ MODAL DE LISTA DE USUARIOS */
+.user-list-modal-content { 
+    padding: 24px 16px 16px 16px; 
+    min-width: 280px; 
+}
+
+.user-list-modal-ul { 
+    list-style: none; 
+    padding: 0; 
+    margin: 16px 0 0 0; 
+    max-height: 320px; 
+    overflow-y: auto; 
+}
+
+.user-list-modal-ul li { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    padding: 8px 0; 
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+}
+
+.user-list-avatar { 
+    width: 36px; 
+    height: 36px; 
+    border-radius: 50%; 
+    background: linear-gradient(135deg, var(--spotify-purple), var(--distrital-gold)); 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 18px; 
+    overflow: hidden; 
     color: var(--spotify-white);
-    position: relative;
-    overflow: hidden;
-    flex-shrink: 0;
-    border: 3px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-.current-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
+.user-list-img { 
+    width: 36px; 
+    height: 36px; 
+    border-radius: 50%; 
+    object-fit: cover; 
 }
 
-.current-avatar .material-icons {
-    font-size: 60px;
-}
-
-.avatar-options {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.avatar-options h4 {
+.user-list-name { 
+    font-weight: 500; 
+    margin-right: 6px; 
     color: var(--spotify-white);
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 8px;
 }
 
-/* Secciones del formulario */
-.form-section {
-    margin-bottom: 32px;
-    padding: 24px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+.user-list-username { 
+    color: var(--spotify-light-gray); 
+    font-size: 13px; 
 }
 
-.form-section h4 {
-    color: var(--spotify-white);
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 20px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    align-items: center;
-    gap: 8px;
+/* ✅ RESPONSIVE MEJORADO */
+@media (max-width: 1024px) {
+    .playlists-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+    }
+    
+    .stats-compact {
+        gap: 20px;
+    }
 }
 
-.form-section h4::before {
-    content: '';
-    width: 4px;
-    height: 20px;
-    background: linear-gradient(135deg, var(--spotify-purple) 0%, var(--distrital-gold) 100%);
-    border-radius: 2px;
-}
-
-/* Form groups mejorados para el perfil */
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--spotify-white);
-    font-weight: 500;
-    font-size: 14px;
-}
-
-.form-group input[type="text"],
-.form-group input[type="email"],
-.form-group input[type="password"],
-.form-group input[type="url"] {
-    width: 100%;
-    padding: 12px 16px;
-    border-radius: 12px;
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--spotify-white);
-    font-size: 14px;
-    transition: all 0.3s ease;
-}
-
-.form-group input[type="text"]:focus,
-.form-group input[type="email"]:focus,
-.form-group input[type="password"]:focus,
-.form-group input[type="url"]:focus {
-    outline: none;
-    border-color: var(--spotify-purple);
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
-}
-
-.form-group input::placeholder {
-    color: var(--spotify-light-gray);
-}
-
-.form-group small {
-    display: block;
-    margin-top: 4px;
-    color: var(--spotify-light-gray);
-    font-size: 12px;
-}
-
-/* Grid de estadísticas */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 16px;
-}
-
-.stat-card {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 20px;
-    text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
-}
-
-.stat-card:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-}
-
-.stat-number {
-    display: block;
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--spotify-purple);
-    margin-bottom: 4px;
-}
-
-.stat-label {
-    font-size: 12px;
-    color: var(--spotify-light-gray);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* Botón para quitar foto */
-#removeProfileImage {
-    align-self: flex-start;
-    padding: 8px 16px;
-    font-size: 13px;
-}
-
-#removeProfileImage .material-icons {
-    font-size: 18px;
-}
-
-/* Acciones del modal mejoradas */
-.modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    margin-top: 32px;
-    padding-top: 24px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.modal-actions .btn-primary {
-    background: linear-gradient(135deg, var(--spotify-purple) 0%, var(--spotify-dark-purple) 100%);
-    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
-}
-
-.modal-actions .btn-primary:hover {
-    background: linear-gradient(135deg, var(--spotify-dark-purple) 0%, #6d28d9 100%);
-    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
-    transform: translateY(-2px);
-}
-
-/* Validación visual */
-.form-group input.error {
-    border-color: var(--error-color);
-    background: rgba(239, 68, 68, 0.1);
-}
-
-.form-group input.success {
-    border-color: var(--success-color);
-    background: rgba(16, 185, 129, 0.1);
-}
-
-.form-group .error-message {
-    color: var(--error-color);
-    font-size: 12px;
-    margin-top: 4px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.form-group .error-message::before {
-    content: '⚠️';
-    font-size: 12px;
-}
-
-/* Preview de imagen */
-.image-preview {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-
-/* Estados de carga */
-.profile-avatar-section.loading {
-    opacity: 0.7;
-    pointer-events: none;
-}
-
-.profile-avatar-section.loading .current-avatar::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 24px;
-    height: 24px;
-    margin: -12px 0 0 -12px;
-    border: 3px solid var(--spotify-light-gray);
-    border-top-color: var(--spotify-purple);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-/* Responsive para el modal de perfil */
 @media (max-width: 768px) {
+    .header .container {
+        flex-direction: column;
+        gap: 16px;
+        padding: 16px 20px;
+    }
+    
+    .nav {
+        gap: 16px;
+    }
+    
+    .user-menu {
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+    }
+    
+    .main-content {
+        margin-top: 120px;
+        max-height: calc(100vh - 120px);
+    }
+    
+    .modal {
+        padding: 10px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10px auto;
+        border-radius: 16px;
+        max-height: calc(100vh - 20px);
+    }
+    
+    .modal-content.large {
+        width: 95%;
+        max-height: calc(100vh - 20px);
+        margin: 10px auto;
+    }
+    
+    .modal-header {
+        padding: 16px 20px;
+    }
+    
+    .modal-header h3 {
+        font-size: 18px;
+        padding-right: 40px;
+    }
+    
+    .modal-body {
+        padding: 16px;
+    }
+    
+    .song-item {
+        padding: 12px;
+        gap: 12px;
+    }
+    
+    .song-cover {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .song-info h5 {
+        font-size: 13px;
+    }
+    
+    .song-info p {
+        font-size: 11px;
+    }
+    
+    .btn-add-song, .btn-remove-song {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+    
+    .playlists-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 16px;
+    }
+    
+    .playlist-card {
+        padding: 16px;
+    }
+    
+    .playlist-cover {
+        height: 120px;
+        font-size: 36px;
+    }
+    
+    .stats-compact {
+        flex-direction: column;
+        gap: 16px;
+        align-items: center;
+    }
+    
+    .stat-item {
+        min-width: 150px;
+    }
+    
+    .search-container {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .btn-search {
+        width: 100%;
+        height: 48px;
+        border-radius: 24px;
+    }
+    
+    .section-title {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+    }
+    
+    .filters {
+        justify-content: center;
+    }
+    
+    .playlist-main-actions {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .playlist-actions-buttons {
+        width: 100%;
+        justify-content: center;
+    }
+    
     .profile-avatar-section {
         flex-direction: column;
         align-items: center;
@@ -1635,6 +1825,64 @@ body {
 }
 
 @media (max-width: 480px) {
+    .container {
+        padding: 0 16px;
+    }
+    
+    .main-content {
+        padding: 16px 0;
+    }
+    
+    .modal-content {
+        border-radius: 12px;
+    }
+    
+    .modal-header {
+        padding: 12px 16px;
+    }
+    
+    .modal-body {
+        padding: 12px;
+    }
+    
+    .song-item {
+        padding: 8px;
+        gap: 8px;
+    }
+    
+    .song-cover {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .btn-add-song, .btn-remove-song {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+    
+    .playlists-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .playlist-cover {
+        height: 100px;
+        font-size: 28px;
+    }
+    
+    .search-results {
+        padding: 12px;
+    }
+    
+    .available-songs {
+        max-height: 300px;
+    }
+    
+    .playlist-songs-list {
+        max-height: 250px;
+    }
+    
     .current-avatar {
         width: 80px;
         height: 80px;
@@ -1657,4 +1905,343 @@ body {
     .stat-number {
         font-size: 18px;
     }
+    
+    .playlist-main-actions {
+        padding: 12px;
+    }
+    
+    .playlist-actions-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .comment-form {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .comment-submit {
+        width: 100%;
+    }
+    /* ✅ ESTILOS MEJORADOS PARA COMENTARIOS */
+#commentsSection {
+    border-top: 2px solid rgba(139, 92, 246, 0.3);
+    padding: 24px;
+    margin-top: 24px;
+    background: linear-gradient(145deg, rgba(30, 20, 50, 0.8) 0%, rgba(45, 27, 105, 0.4) 100%);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.comments-title {
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+    padding-bottom: 12px;
+}
+
+.comments-title .material-icons {
+    color: var(--spotify-purple);
+    font-size: 24px;
+}
+
+.comment-item {
+    margin-bottom: 20px;
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.comment-item:hover {
+    background: rgba(139, 92, 246, 0.1);
+    border-color: rgba(139, 92, 246, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.comment-user {
+    font-weight: 600;
+    color: var(--spotify-purple);
+    font-size: 14px;
+}
+
+.comment-date {
+    font-size: 12px;
+    color: var(--spotify-light-gray);
+    font-style: italic;
+}
+
+.comment-content {
+    font-size: 15px;
+    color: #ffffff;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+.btn-delete-comment {
+    background: none;
+    border: none;
+    color: var(--spotify-light-gray);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-delete-comment:hover {
+    color: var(--error-color);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.btn-delete-comment .material-icons {
+    font-size: 18px;
+}
+
+.empty-comments {
+    color: var(--spotify-light-gray);
+    font-size: 14px;
+    margin: 20px 0;
+    text-align: center;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.empty-comments.error {
+    color: var(--error-color);
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+/* ✅ FORMULARIO DE COMENTARIOS MEJORADO */
+#commentForm {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.comment-input,
+#commentInput {
+    flex: 1;
+    padding: 12px 16px !important;
+    border-radius: 12px !important;
+    border: 2px solid rgba(139, 92, 246, 0.3) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #ffffff !important;
+    font-size: 14px !important;
+    transition: all 0.3s ease !important;
+    font-family: inherit !important;
+}
+
+.comment-input:focus,
+#commentInput:focus {
+    outline: none !important;
+    border-color: var(--spotify-purple) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1) !important;
+}
+
+.comment-input::placeholder,
+#commentInput::placeholder {
+    color: var(--spotify-light-gray) !important;
+}
+
+#commentForm button[type="submit"] {
+    background: linear-gradient(135deg, var(--spotify-purple) 0%, var(--spotify-dark-purple) 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 12px 20px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4) !important;
+}
+
+#commentForm button[type="submit"]:hover {
+    background: linear-gradient(135deg, var(--spotify-dark-purple) 0%, #6d28d9 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6) !important;
+}
+
+#commentForm button[type="submit"]:disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+#commentForm button[type="submit"] .material-icons {
+    font-size: 18px !important;
+}
+
+/* ✅ LOADING STATE MEJORADO */
+.loading {
+    color: var(--spotify-light-gray);
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.loading::after {
+    content: '';
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--spotify-light-gray);
+    border-top-color: var(--spotify-purple);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* ✅ RESPONSIVE PARA COMENTARIOS */
+@media (max-width: 768px) {
+    #commentsSection {
+        padding: 16px;
+        margin-top: 16px;
+    }
+    
+    .comments-title {
+        font-size: 18px;
+        margin-bottom: 16px;
+    }
+    
+    .comment-item {
+        padding: 12px;
+        margin-bottom: 16px;
+    }
+    
+    .comment-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    
+    #commentForm {
+        flex-direction: column;
+        gap: 12px;
+        padding: 12px;
+    }
+    
+    #commentForm button[type="submit"] {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .comment-content {
+        font-size: 14px;
+    }
+    
+    .comment-user {
+        font-size: 13px;
+    }
+    
+    .comment-date {
+        font-size: 11px;
+    }
+    
+    .btn-delete-comment .material-icons {
+        font-size: 16px;
+    }
+}
+/* ✅ LISTA DE COMENTARIOS CON SCROLL */
+#commentsList {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 8px;
+    margin-bottom: 16px;
+}
+
+#commentsList::-webkit-scrollbar {
+    width: 6px;
+}
+
+#commentsList::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+#commentsList::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--spotify-purple) 0%, var(--spotify-dark-purple) 100%);
+    border-radius: 3px;
+}
+
+/* ✅ ANIMACIÓN PARA NUEVOS COMENTARIOS */
+.comment-item.new-comment {
+    animation: slideInFromBottom 0.5s ease-out;
+    border-color: var(--spotify-purple);
+    background: rgba(139, 92, 246, 0.15);
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+}
+
+@keyframes slideInFromBottom {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+        border-color: var(--spotify-purple);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        border-color: var(--spotify-purple);
+    }
+}
+
+/* ✅ FORMULARIO FIJO EN LA PARTE INFERIOR */
+#commentForm {
+    position: sticky;
+    bottom: 0;
+    backdrop-filter: blur(10px);
+}
+
+/* ✅ RESPONSIVE MEJORADO */
+@media (max-width: 768px) {
+    #commentsList {
+        max-height: 300px;
+    }
+    
+    #commentForm {
+        position: static;
+    }
+}
+
+@media (max-width: 480px) {
+    #commentsList {
+        max-height: 250px;
+    }
+}
 }

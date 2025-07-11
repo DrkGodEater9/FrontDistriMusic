@@ -1,6 +1,9 @@
 // DistriMusic - JavaScript de Autenticación FUNCIONAL con Backend
 
-// URL base de la API
+/**
+ * Configuración base para la API REST
+ * @constant {string} API_BASE_URL - URL base para todas las peticiones al backend
+ */
 const API_BASE_URL = 'http://localhost:8090/api';
 
 // Función para alternar entre login y registro
@@ -21,7 +24,13 @@ function toggleForm() {
     }
 }
 
-// ✅ FUNCIÓN PARA LOGIN CON FETCH
+/**
+ * Maneja el proceso de inicio de sesión del usuario
+ * @async
+ * @param {Event} event - Evento del formulario de login
+ * @throws {Error} Si hay problemas de conexión con el servidor
+ * @returns {Promise<void>}
+ */
 async function handleLogin(event) {
     event.preventDefault();
     
@@ -90,7 +99,14 @@ async function handleLogin(event) {
     }
 }
 
-// ✅ FUNCIÓN PARA REGISTRO CON FETCH - ARREGLADA
+/**
+ * Maneja el proceso de registro de nuevos usuarios
+ * @async
+ * @param {Event} event - Evento del formulario de registro
+ * @throws {Error} Si hay problemas de conexión o validación con el servidor
+ * @returns {Promise<void>}
+ * @description Realiza validaciones locales y envía los datos al backend para crear un nuevo usuario
+ */
 async function handleRegister(event) {
     event.preventDefault();
     
@@ -166,7 +182,19 @@ async function handleRegister(event) {
     }
 }
 
-// ✅ VALIDACIÓN DEL FORMULARIO DE REGISTRO - ARREGLADA
+/**
+ * Valida todos los campos del formulario de registro
+ * @param {Object} formData - Datos del formulario a validar
+ * @param {string} formData.usuario - Nombre de usuario
+ * @param {string} formData.nombre - Nombre completo
+ * @param {string} formData.password - Contraseña
+ * @param {string} formData.codigoEstudiantil - Código de estudiante
+ * @param {string} formData.carrera - Carrera del estudiante
+ * @param {string} formData.ubicacion - Ciudad de residencia
+ * @param {string} formData.email - Correo electrónico
+ * @param {string} confirmPassword - Contraseña de confirmación
+ * @returns {boolean} true si todos los campos son válidos, false en caso contrario
+ */
 function validateRegistrationForm(formData, confirmPassword) {
     // Verificar campos obligatorios
     for (const [key, value] of Object.entries(formData)) {
@@ -255,7 +283,16 @@ function showMessage(message, type = 'info') {
     }, 5000);
 }
 
-// ✅ VALIDACIÓN DE PASSWORD CON REQUISITOS
+/**
+ * Valida que la contraseña cumpla con todos los requisitos de seguridad
+ * @param {string} password - Contraseña a validar
+ * @returns {boolean} true si cumple con todos los requisitos:
+ *  - Mínimo 8 caracteres
+ *  - Al menos una mayúscula
+ *  - Al menos una minúscula
+ *  - Al menos un número
+ *  - Al menos un carácter especial (@$!%*?&)
+ */
 function validatePassword(password) {
     const requirements = {
         length: password.length >= 8,
@@ -268,7 +305,12 @@ function validatePassword(password) {
     return Object.values(requirements).every(req => req);
 }
 
-// ✅ VALIDACIÓN DE EMAIL
+/**
+ * Valida el formato de un correo electrónico
+ * @param {string} email - Correo electrónico a validar
+ * @returns {boolean} true si el formato es válido, false en caso contrario
+ * @description Utiliza una expresión regular para validar el formato básico de email
+ */
 function validateEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -360,7 +402,12 @@ function validatePasswordMatch() {
     }
 }
 
-// ✅ VERIFICAR SI YA ESTÁ LOGUEADO
+/**
+ * Verifica si existe una sesión activa del usuario
+ * @returns {void}
+ * @description Comprueba el localStorage en busca de datos de sesión activa
+ * y redirige al dashboard si encuentra una sesión válida
+ */
 function checkIfLoggedIn() {
     const isLoggedIn = localStorage.getItem('isLoggedIn');
     const currentUser = localStorage.getItem('currentUser');
