@@ -10,20 +10,16 @@ let currentPlaylistSongs = []; // Array para mantener las canciones actuales de 
 
 // ✅ FUNCIÓN PARA VERIFICAR AUTENTICACIÓN
 function checkAuthentication() {
-    console.log('🔍 Verificando autenticación...');
-
     const isLoggedIn = localStorage.getItem('isLoggedIn');
     const userData = localStorage.getItem('currentUser');
 
     if (!isLoggedIn || isLoggedIn !== 'true' || !userData) {
-        console.log('❌ No hay sesión activa, redirigiendo al login');
         window.location.href = 'auth.html';
         return false;
     }
 
     try {
         currentUser = JSON.parse(userData);
-        console.log('✅ Usuario cargado:', currentUser.nombre);
         return true;
     } catch (error) {
         console.error('❌ Error parsing user data:', error);
@@ -50,8 +46,6 @@ function loadUserInfo() {
 
 // ✅ FUNCIÓN PARA CERRAR SESIÓN
 function logout() {
-    console.log('🔄 Ejecutando logout...');
-
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('currentUser');
 
@@ -63,6 +57,13 @@ function logout() {
 }
 
 // ✅ FUNCIÓN PARA CARGAR ESTADÍSTICAS
+/**
+ * Carga las estadísticas del usuario actual
+ * @async
+ * @returns {Promise<void>}
+ * @description Obtiene el número de seguidores y seguidos del usuario actual
+ * y actualiza los contadores en la interfaz
+ */
 async function loadUserStats() {
     if (!currentUser) return;
 
@@ -84,7 +85,7 @@ async function loadUserStats() {
         }
 
     } catch (error) {
-        console.error('❌ Error loading user stats:', error);
+        showMessage('Error al cargar estadísticas de usuario', 'error');
     }
 }
 
@@ -218,19 +219,6 @@ function showPlaylistDetailModal(playlist, songs) {
     selectedPlaylistForSongs = playlist.id;
 }
 
-// ✅ FUNCIÓN PARA CARGAR COMENTARIOS - CORREGIDA (ORDEN CRONOLÓGICO)
-/**
- * Carga los comentarios asociados a una playlist específica
- * @async
- * @param {number} playlistId - ID de la playlist para cargar sus comentarios
- * @throws {Error} Si hay problemas de conexión con el servidor
- * @returns {Promise<void>}
- * @description Realiza una petición al backend para obtener todos los comentarios
- * asociados a una playlist y los muestra en la interfaz
- */
-// ==========================================
-// GESTIÓN DE PLAYLISTS Y CANCIONES
-// ==========================================
 
 /**
  * Carga y muestra los detalles completos de una playlist
@@ -255,50 +243,7 @@ async function viewPlaylistDetails(playlistId) {
     }
 }
 
-/**
- * Añade una canción a una playlist específica
- * @async
- * @param {number} playlistId - ID de la playlist
- * @param {number} songId - ID de la canción a añadir
- * @param {HTMLElement} buttonElement - Elemento botón que triggereó la acción
- * @throws {Error} Si hay problemas de conexión o la canción ya existe
- * @returns {Promise<void>}
- * @description Verifica duplicados y realiza la petición al backend para añadir la canción
- */
-async function addSongToPlaylist(playlistId, songId, buttonElement) {
-    // ...código existente
-}
 
-/**
- * Elimina una canción de una playlist
- * @async
- * @param {number} playlistId - ID de la playlist
- * @param {number} songId - ID de la canción a eliminar
- * @throws {Error} Si hay problemas de conexión o permisos
- * @returns {Promise<void>}
- * @description Solicita confirmación y envía la petición de eliminación al backend
- */
-async function removeSongFromPlaylist(playlistId, songId) {
-    // ...código existente
-}
-
-/**
- * Crea una nueva playlist en el sistema
- * @async
- * @param {Object} playlistData - Datos de la nueva playlist
- * @param {string} playlistData.nombre - Nombre de la playlist
- * @param {boolean} playlistData.esPublica - Indica si la playlist será pública
- * @param {string} [playlistData.imageUrl] - URL de la imagen de portada (opcional)
- * @throws {Error} Si hay problemas de validación o conexión
- * @returns {Promise<Object|null>} La playlist creada o null si hay error
- */
-async function createPlaylist(playlistData) {
-    // ...código existente
-}
-
-// ==========================================
-// GESTIÓN DE COMENTARIOS
-// ==========================================
 
 /**
  * Carga los comentarios asociados a una playlist específica
@@ -556,12 +501,19 @@ async function viewPlaylistDetails(playlistId) {
         showPlaylistDetailModal(playlist, songs);
 
     } catch (error) {
-        console.error('❌ Error loading playlist details:', error);
         showMessage('Error de conexión', 'error');
     }
 }
 
 // ✅ FUNCIÓN PARA MOSTRAR MODAL DE AGREGAR CANCIONES - MEJORADA
+/**
+ * Muestra el modal para agregar canciones a una playlist
+ * @async
+ * @param {number} playlistId - ID de la playlist a la que se agregarán canciones
+ * @returns {Promise<void>}
+ * @description Carga todas las canciones disponibles que no están en la playlist
+ * y las muestra en un modal con opciones de filtrado y búsqueda
+ */
 async function showAddSongsModal(playlistId) {
     try {
         // Cargar todas las canciones disponibles
@@ -630,7 +582,6 @@ async function showAddSongsModal(playlistId) {
         searchInput.addEventListener('input', filterSongs);
 
     } catch (error) {
-        console.error('❌ Error loading songs:', error);
         showMessage('Error de conexión', 'error');
     }
 }
@@ -652,7 +603,7 @@ function filterSongs() {
     });
 }
 
-// ✅ FUNCIÓN PARA AGREGAR CANCIÓN A PLAYLIST - MEJORADA
+// ✅ FUNCIÓN PARA AGREGAR CANCIÓN A PLAYLIST 
 /**
  * Añade una canción a una playlist específica
  * @async
@@ -722,6 +673,14 @@ async function addSongToPlaylist(playlistId, songId, buttonElement) {
 }
 
 // ✅ FUNCIÓN PARA REFRESCAR CANCIONES DE PLAYLIST ACTUAL
+/**
+ * Actualiza la lista de canciones de la playlist actual
+ * @async
+ * @param {number} playlistId - ID de la playlist a actualizar
+ * @returns {Promise<void>}
+ * @description Refresca la lista de canciones de la playlist desde el servidor
+ * para mantener sincronizada la vista con los datos más recientes
+ */
 async function refreshCurrentPlaylistSongs(playlistId) {
     try {
         const response = await fetch(`${API_BASE_URL}/playlists/${playlistId}/songs`);
@@ -729,7 +688,7 @@ async function refreshCurrentPlaylistSongs(playlistId) {
             currentPlaylistSongs = await response.json();
         }
     } catch (error) {
-        console.error('❌ Error refreshing playlist songs:', error);
+        showMessage('Error al actualizar las canciones de la playlist', 'error');
     }
 }
 
@@ -792,7 +751,6 @@ async function removeSongFromPlaylist(playlistId, songId) {
             showMessage(errorData || 'Error eliminando canción', 'error');
         }
     } catch (error) {
-        console.error('❌ Error removing song from playlist:', error);
         showMessage('Error de conexión', 'error');
     }
 }
@@ -814,6 +772,13 @@ function closeAddSongsModal() {
 }
 
 // ✅ RESTO DE FUNCIONES (se mantienen igual)
+/**
+ * Carga las playlists del usuario actual
+ * @async
+ * @returns {Promise<void>}
+ * @description Obtiene todas las playlists creadas por el usuario actual
+ * y las renderiza en la sección correspondiente
+ */
 async function loadMyPlaylists() {
     if (!currentUser) return;
 
@@ -830,11 +795,17 @@ async function loadMyPlaylists() {
             container.innerHTML = '<div class="empty-state"><h3>Error cargando playlists</h3></div>';
         }
     } catch (error) {
-        console.error('❌ Error loading playlists:', error);
         container.innerHTML = '<div class="empty-state"><h3>Error de conexión</h3></div>';
     }
 }
 
+/**
+ * Carga todas las playlists públicas del sistema
+ * @async
+ * @returns {Promise<void>}
+ * @description Obtiene las playlists marcadas como públicas de todos los usuarios
+ * y las renderiza en la sección de exploración
+ */
 async function loadPublicPlaylists() {
     const container = document.getElementById('playlistsPublicas');
     if (!container) return;
@@ -896,17 +867,6 @@ function renderPlaylists(playlists, container, isOwner = false) {
     container.innerHTML = playlistsHTML;
 }
 
-/**
- * Realiza una búsqueda de canciones en el sistema
- * @async
- * @throws {Error} Si hay problemas de conexión con el servidor
- * @returns {Promise<void>}
- * @description Obtiene el término de búsqueda del input y realiza la petición al backend,
- * mostrando los resultados en la interfaz
- */
-// ==========================================
-// BÚSQUEDA Y FILTRADO
-// ==========================================
 
 /**
  * Realiza una búsqueda de canciones en el sistema
@@ -1092,7 +1052,7 @@ function showSection(sectionName) {
     }
 }
 
-// ✅ FUNCIÓN PARA MOSTRAR MENSAJES - MEJORADA
+// ✅ FUNCIÓN PARA MOSTRAR MENSAJES
 function showMessage(message, type = 'info') {
     const existingMessage = document.querySelector('.dashboard-message');
     if (existingMessage) {
@@ -1216,6 +1176,16 @@ function closeUserListModal() {
 }
 
 // ✅ MOSTRAR PERFIL DEL USUARIO CREADOR DE LA PLAYLIST
+/**
+ * Muestra el perfil detallado de un usuario
+ * @async
+ * @param {string} usuario - Nombre de usuario a visualizar
+ * @param {string} nombre - Nombre completo del usuario
+ * @param {string} profileImageUrl - URL de la imagen de perfil
+ * @returns {Promise<void>}
+ * @description Carga y muestra la información detallada del perfil de un usuario
+ * incluyendo sus datos personales y opciones para seguirlo
+ */
 async function viewUserProfile(usuario, nombre, profileImageUrl) {
     try {
         const response = await fetch(`${API_BASE_URL}/users/${usuario}`);
@@ -1281,21 +1251,6 @@ function closeUserProfileModal() {
     const modal = document.getElementById('userProfileModal');
     if (modal) modal.style.display = 'none';
 }
-
-// Seguir usuario
-/**
- * Sigue a un usuario en el sistema
- * @async
- * @param {string} usuario - Nombre de usuario a seguir
- * @param {string} nombre - Nombre completo del usuario para mostrar en mensajes
- * @throws {Error} Si hay problemas de conexión o ya se sigue al usuario
- * @returns {Promise<void>}
- * @description Envía una petición al backend para establecer una relación de seguimiento
- * entre el usuario actual y el usuario objetivo
- */
-// ==========================================
-// GESTIÓN DE USUARIOS Y SEGUIDORES
-// ==========================================
 
 /**
  * Sigue a un usuario en el sistema
@@ -1363,6 +1318,13 @@ function updateAvatarPreview(imageUrl) {
     }
 }
 
+/**
+ * Carga estadísticas detalladas del perfil del usuario
+ * @async
+ * @returns {Promise<void>}
+ * @description Obtiene el número de playlists, seguidores, seguidos y fecha de registro
+ * del usuario actual y actualiza la información en el modal de perfil
+ */
 async function loadUserStatistics() {
     if (!currentUser) return;
 
@@ -1414,18 +1376,6 @@ function removeProfileImage() {
     document.getElementById('profileImageUrl').value = '';
     updateAvatarPreview('');
 }
-
-/**
- * Valida que una contraseña cumpla con los requisitos de seguridad
- * @param {string} password - Contraseña a validar
- * @returns {Object} Objeto con el resultado de la validación
- * @property {boolean} isValid - Indica si la contraseña es válida
- * @property {string[]} errors - Lista de requisitos no cumplidos
- * @description Verifica longitud mínima, mayúsculas, minúsculas, números y caracteres especiales
- */
-// ==========================================
-// VALIDACIONES Y UTILIDADES
-// ==========================================
 
 /**
  * Valida que una contraseña cumpla con los requisitos de seguridad
@@ -1508,6 +1458,14 @@ function clearFieldState(fieldId) {
     field.classList.remove('error', 'success');
 }
 
+/**
+ * Maneja el envío del formulario de actualización de perfil
+ * @async
+ * @param {Event} event - Evento del formulario
+ * @returns {Promise<void>}
+ * @description Valida y envía los datos actualizados del perfil al servidor,
+ * incluyendo nombre, carrera, email, imagen de perfil y contraseña opcional
+ */
 async function handleProfileFormSubmit(event) {
     event.preventDefault();
 
